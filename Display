@@ -1,10 +1,3 @@
-/**
- * 
- * @Authors
- * 
- * gh
- abc
- */
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -74,7 +67,7 @@ public class Display extends JComponent {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			
+
 			onloop(g);
 			g.setColor(Color.BLACK);
 			g.drawRect(DISPLAY_WIDTH/6, DISPLAY_HEIGHT/6, DISPLAY_WIDTH*2/3, DISPLAY_HEIGHT*5/6 - DISPLAY_HEIGHT/10);
@@ -90,28 +83,28 @@ public class Display extends JComponent {
 	}
 
 	public void onloop(Graphics g) {
-	
+
 		for(int k = 0; k <ballarray.length; k++){
-			
-				
+
+
 				Ball temp = ballarray[k];
 				temp.force = new Force();
-				
-				
-			
+
+
+
 					for(int j = 0; j <ballarray.length; j++){
 						if(k!=j){
 						Ball temp2 = ballarray[j];
-						
+
 						temp.force.add(CalculateForce(ballarray[j], ballarray[k]));
 						System.out.println(ballarray[0].force);
 						}
 					}
 				}
-		
-		
-				
-				
+
+
+
+
 		for (int i = 0; i<ballarray.length; i++) {
 			ballarray[i].update(g, DISPLAY_WIDTH, DISPLAY_HEIGHT, TIME_BETWEEN_REPLOTS);
 			if (ballarray[i].hitWall == true) {
@@ -129,9 +122,9 @@ public class Display extends JComponent {
 				ballarray[i].speed*=Math.sqrt(lastvolume/volume);
 			}
 		}
-		
+
 	}
-	
+
 	public Force CalculateForce(Ball ballA, Ball ballB) {
 		// TODO Auto-generated method stub
 		double magnitude = Math.abs(ballA.charge) * Math.abs(ballB.charge);
@@ -139,16 +132,16 @@ public class Display extends JComponent {
 		magnitude *= k;
 		magnitude /= distanceSquared(ballA, ballB);
 		calculateTheta(ballA, ballB);
-		
+
 		double theta = calculateTheta(ballA, ballB);
 		if(!attract){
 			theta+=Math.PI;
 		}
 		Force retval = new Force(magnitude, theta);
 		return retval;
-		
+
 	}
-	
+
 	private double calculateTheta(Ball b1, Ball b2) {
 		// TODO Auto-generated method stub
 		double theta = 1000;
