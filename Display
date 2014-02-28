@@ -1,4 +1,9 @@
-
+/**
+ * 
+ * @Authors
+ * Ophir Sneh & Matthew Seligson
+ * 
+ */
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -13,7 +18,7 @@ public class Display extends JComponent {
 	public int DISPLAY_WIDTH;   
 	public int DISPLAY_HEIGHT;
 	private boolean paintloop = true;
-	int TIME_BETWEEN_REPLOTS = 50;
+	int TIME_BETWEEN_REPLOTS = 1;
 	Ball[] ballarray;
 	int xdif = 0;
 	int ydif = 0;
@@ -34,17 +39,21 @@ public class Display extends JComponent {
 	public void init() {
 		setSize(DISPLAY_WIDTH, DISPLAY_HEIGHT);
 		paintloop = true;
-		ballarray = new Ball[16];
+		ballarray = new Ball[3];
 		Ball ball;
-		for (int i = 0; i<4; i++) {
-			for (int j = 0; j<4; j++) {
-				ball = new Ball(20, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 1, -1, 0.75, .000005*Math.random()*10);
+		for (int i = 0; i<1; i++) {
+			for (int j = 0; j<2; j++) {
+				ball = new Ball(20, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 1, -1, 20, Math.random()/100);
 				ballarray[i*4+j] = ball;
 				originalX[i*4+j] = ballarray[i*4+j].x;
 				originalY[i*4+j] = ballarray[i*4+j].y;
 			}
 
 		}
+		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 1, -1, 20, Math.random()/1);
+		ballarray[2] = ball;
+		originalX[2] = ballarray[2].x;
+		originalY[2] = ballarray[2].y;
 
 
 		repaint();
@@ -98,23 +107,12 @@ public class Display extends JComponent {
 						}
 					}
 				}
+		
+		
 				
 				
-		
-	
-			
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		for (int i = 0; i<ballarray.length; i++) {
-			ballarray[i].update(g, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+			ballarray[i].update(g, DISPLAY_WIDTH, DISPLAY_HEIGHT, TIME_BETWEEN_REPLOTS);
 			if (ballarray[i].hitWall == true) {
 				if (xdif<0) {
 					ballarray[i].x+=xdif;
