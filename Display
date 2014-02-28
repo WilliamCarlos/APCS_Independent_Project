@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 
 public class Display extends JComponent {
@@ -50,6 +51,7 @@ public class Display extends JComponent {
 		add(start);
 		start.setVisible(true);
 		ballarray = new Ball[3];
+		chargeDisplay = new JLabel[ballarray.length];
 	Ball ball;
 		for (int i = 0; i<1; i++) {
 			for (int j = 0; j<2; j++) {
