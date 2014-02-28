@@ -1,22 +1,22 @@
 import java.awt.Graphics;
 
-//test commit
+
 public class Ball {
-	public double x, y, mySize, mass, dx, dy, speed, speedx, speedy, charge, acceleration, accelerationD;
+	public double x, y, mySize, mass, dx, dy, speed, charge, acceleration, accelerationD;
 	public boolean hitWall;
 	public Force force = new Force();
 	
 
 
-	public Ball (double size, double X, double Y, double dirx, double diry, double speed, double charge) {
+	public Ball (double size, double X, double Y, double dirx, double diry, double sped, double charge) {
 		mySize = size;
 		x = X;
 		y = Y;
 		dx = dirx;
 		dy = diry;
-		mass = size/30;
+		mass = Math.pow(getRadius(), 2)/30;
 		//double angle = 2 * Math.PI * Math.random();  // Random direction.
-		speed = speed+Math.random()/100;    // Random speed.
+		speed = sped+Math.random()/100;    // Random speed.
 		dx = 1 * speed;
 		dy = 1 * speed;
 		hitWall = false;
@@ -33,21 +33,20 @@ public class Ball {
 		g.fillOval((int) xx, (int) yy, (int) mySize, (int) mySize);
 	}
 
-	public void update(Graphics g, int width, int height) {
+	public void update(Graphics g, int width, int height, int tickLength) {
 		wallcollisions(width, height);
-		x = x+dx*speedx;
-		y = y+dy*speedy;
+		updateAcceleration();
+		dx+=Math.cos(accelerationD)*acceleration*tickLength/1000;
+		dy+=Math.sin(accelerationD)*acceleration*tickLength/1000;
+		x = x+dx*tickLength/1000;
+		y = y+dy*tickLength/1000;
 	} 
 	
 	public void updateAcceleration() {
 		acceleration = force.magnitude/mass;
 		accelerationD = force.direction;
 	}
-	
-	public void updateSpeed() {
-		speed = 
-	}
-	
+
 	public void wallcollisions(int width, int height) {
 		hitWall = false;
 		int radius = (int) getRadius();
