@@ -1,6 +1,6 @@
 import java.awt.Graphics;
 
-
+//test commit
 public class Ball {
 	public double x, y, mySize, mass, dx, dy, speed, speedx, speedy, charge, acceleration, accelerationD;
 	public boolean hitWall;
