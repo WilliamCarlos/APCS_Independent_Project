@@ -1,0 +1,92 @@
+import java.awt.Graphics;
+
+
+public class Ball {
+	public double x, y, mySize, mass, dx, dy, speed, speedx, speedy, charge, acceleration, accelerationD;
+	public boolean hitWall;
+	public Force force = new Force();
+	
+
+
+	public Ball (double size, double X, double Y, double dirx, double diry, double speed, double charge) {
+		mySize = size;
+		x = X;
+		y = Y;
+		dx = dirx;
+		dy = diry;
+		mass = size/30;
+		//double angle = 2 * Math.PI * Math.random();  // Random direction.
+		speed = speed+Math.random()/100;    // Random speed.
+		dx = 1 * speed;
+		dy = 1 * speed;
+		hitWall = false;
+		this.charge = charge;
+	}
+
+	public double getRadius() {
+		return mySize/2;
+	}
+
+	public void draw(Graphics g) {
+		double xx = x-getRadius();
+		double yy = y-getRadius();
+		g.fillOval((int) xx, (int) yy, (int) mySize, (int) mySize);
+	}
+
+	public void update(Graphics g, int width, int height) {
+		wallcollisions(width, height);
+		x = x+dx*speedx;
+		y = y+dy*speedy;
+	} 
+	
+	public void updateAcceleration() {
+		acceleration = force.magnitude/mass;
+		accelerationD = force.direction;
+	}
+	
+	public void updateSpeed() {
+		speed = 
+	}
+	
+	public void wallcollisions(int width, int height) {
+		hitWall = false;
+		int radius = (int) getRadius();
+		/*
+		 * checks collisions with walls
+		 */
+		if (x+radius >= width*5/6) {
+			dx*=-1;
+			hitWall = true;
+		}
+		if (x-radius <= width/6 + 3) {
+			dx*=-1;
+			hitWall = true;
+		}
+		if (y+radius >= height*9/10) {
+				dy*=-1;
+			hitWall = true;
+		}
+		if (y-radius <= height/6 + 3) {
+			dy*=-1;
+			hitWall = true;
+		}
+		/*
+		 * makes sure balls wont escape if they glitch out
+		 */
+		if (x <= width*5/6) {
+			x+=radius;
+		}
+		if (x >= width/6 + 3) {
+			x-=radius;
+		}
+		if(y >= height*9/10) {
+			y-=radius;
+		}
+		if(y <= height/6 + 3) {
+			y+=radius;
+		}
+	}
+
+}
+
+
