@@ -62,14 +62,14 @@ public class Display extends JComponent {
 		start.setBounds(20, 20, 100, 50);
 		add(start);
 		start.setVisible(true);
-		ballarray = new Ball[3];
+		ballarray = new Ball[2];
 		chargeDisplay = new JLabel[ballarray.length];
 		
 	Ball ball;
 		for (int i = 0; i<1; i++) {
-			for (int j = 0; j<2; j++) {
+			for (int j = 0; j<1; j++) {
 				
-				ball = new Ball(20, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 1, -1, 20, -Math.random()/10000);
+				ball = new Ball(30, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 0, 0, 0, -Math.random()/7000);
 				ballarray[i*3+j] = ball;
 				originalX[i*3+j] = ballarray[i*3+j].x;
 				originalY[i*3+j] = ballarray[i*3+j].y;
@@ -88,12 +88,13 @@ public class Display extends JComponent {
 			}
 
 		}
-		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 1, -1, 20, Math.random()/2500);
-		ballarray[2] = ball;
-		originalX[2] = ballarray[2].x;
-		originalY[2] = ballarray[2].y;
-		chargeDisplay[2] = new JLabel();
-		JLabel temp = chargeDisplay[2];
+		
+		ball = new Ball(23, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 1, -1, 20, -Math.random()/2000);
+		ballarray[1] = ball;
+		originalX[1] = ballarray[1].x;
+		originalY[1] = ballarray[1].y;
+		chargeDisplay[1] = new JLabel();
+		JLabel temp = chargeDisplay[1];
 		String str = "";
 		str+=(int)(ball.charge*1000000);
 		str+="µC";
