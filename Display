@@ -23,7 +23,7 @@ public class Display extends JComponent {
 	public int DISPLAY_WIDTH;   
 	public int DISPLAY_HEIGHT;
 	private boolean paintloop = true;
-	int TIME_BETWEEN_REPLOTS = 1;
+	int TIME_BETWEEN_REPLOTS = 5;
 	Ball[] ballarray;
 	int xdif = 0;
 	int ydif = 0;
@@ -55,12 +55,13 @@ public class Display extends JComponent {
 	Ball ball;
 		for (int i = 0; i<1; i++) {
 			for (int j = 0; j<2; j++) {
+				
 				ball = new Ball(20, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 1, -1, 20, Math.random()/100);
-				ballarray[i*4+j] = ball;
-				originalX[i*4+j] = ballarray[i*4+j].x;
-				originalY[i*4+j] = ballarray[i*4+j].y;
-				chargeDisplay[i*4+j] = new JLabel();
-				JLabel temp = chargeDisplay[i*4+j];
+				ballarray[i*3+j] = ball;
+				originalX[i*3+j] = ballarray[i*3+j].x;
+				originalY[i*3+j] = ballarray[i*3+j].y;
+				chargeDisplay[i*3+j] = new JLabel();
+				JLabel temp = chargeDisplay[i*3+j];
 				
 				String str = "";
 				str+=ball.acceleration;
@@ -73,7 +74,7 @@ public class Display extends JComponent {
 			}
 
 		}
-		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 1, -1, 20, Math.random()/1);
+		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 1, -1, 20, -Math.random()/1);
 		ballarray[2] = ball;
 		originalX[2] = ballarray[2].x;
 		originalY[2] = ballarray[2].y;
@@ -242,12 +243,12 @@ public class Display extends JComponent {
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
-			if(this.getText().equals("Stop")) {
+			if(this.getText().equals("Start")) {
 				togglePaintLoop();
-				this.setText("Start");
+				this.setText("Pause");
 			} else {
 				togglePaintLoop();
-				this.setText("Stop");
+				this.setText("Start");
 			}
 		}
 	}
