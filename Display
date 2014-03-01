@@ -12,6 +12,9 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +25,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 
-public class Display extends JComponent {
+public class Display extends JComponent implements MouseListener, MouseMotionListener {
 	public double k = 9*Math.pow(10, 9);
 	double permitivity_of_free_space = 8.85418782 * Math.pow(10, -12);
 	public int DISPLAY_WIDTH;   
@@ -41,6 +44,8 @@ public class Display extends JComponent {
 	JLabel[] chargeDisplay;
 	Force[][] electricField;
 	double[][] voltageValue;
+	String voltageOnMouse = "";
+	int pixel =7;
 	
 	int timeCounter = -TIME_BETWEEN_REPLOTS;
 	
@@ -65,12 +70,14 @@ public class Display extends JComponent {
 		start.setVisible(true);
 		ballarray = new Ball[2];
 		chargeDisplay = new JLabel[ballarray.length];
+		addMouseListener(this);
+		addMouseMotionListener(this);
 		
 	Ball ball;
 		for (int i = 0; i<1; i++) {
 			for (int j = 0; j<1; j++) {
 				
-				ball = new Ball(15, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 0, 0, 0, Math.max(Math.random()*100/1000000, 20/1000000));
+				ball = new Ball(15, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 0, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000));
 				ballarray[i*3+j] = ball;
 				originalX[i*3+j] = ballarray[i*3+j].x;
 				originalY[i*3+j] = ballarray[i*3+j].y;
@@ -90,7 +97,7 @@ public class Display extends JComponent {
 
 		}
 		
-		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 1, -1, 20, -Math.max(Math.random()*300/1000000, 35/1000000));
+		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 1, -1, 20, -Math.max(Math.random()*100/1000000, 35/1000000));
 		ballarray[1] = ball;
 		originalX[1] = ballarray[1].x;
 		originalY[1] = ballarray[1].y;
@@ -216,32 +223,34 @@ public class Display extends JComponent {
 		double belowZero = getNegativeAmount(list);
 		double exactlyZero  = getZeroAmount(list);
 		double aboveZero = getPositiveAmount(list);
+	
 		
-	//	System.out.println("JJJJJJJJJJJJJJJJJJJJJ " + max);
-		for(int x = DISPLAY_WIDTH/6 +5; x < DISPLAY_WIDTH*5/6 -10; x+=7){
-			for (int y = DISPLAY_HEIGHT/6+5; y <DISPLAY_HEIGHT*5/6 + DISPLAY_HEIGHT/10 -30; y+=7){
+		
+		for(int x = DISPLAY_WIDTH/6 +5; x < DISPLAY_WIDTH*5/6 -10; x+=pixel){
+			for (int y = DISPLAY_HEIGHT/6+5; y <DISPLAY_HEIGHT*5/6 + DISPLAY_HEIGHT/10 -30; y+=pixel){
 				double value = voltageValue[x][y];
-				g.setColor(getBackground());
-				int colorVal = 255;
+				g.setColor(Color.black);
+				int colorVal = 128;
 				boolean hot = false;
 				
 				
 				if(value<0){
-					colorVal = (int)(list.indexOf(value)/belowZero*255);
+					colorVal = (int)((belowZero - list.indexOf(value))/belowZero*128);
+					colorVal = Math.min(colorVal, 128);
 					hot = false;
-					System.out.println(colorVal);
+				
 					
 				}else if(value>0){
-					colorVal = (int)((list.indexOf(value)-belowZero-exactlyZero)/aboveZero*255);
-					
+					colorVal = (int)((list.indexOf(value)-belowZero+2)/aboveZero*128);
+					colorVal = Math.min(colorVal, 128);
 					hot = true;
 				}
 				
 				if(!hot){
-					g.setColor(new Color(255-colorVal, 0, colorVal));
+					g.setColor(new Color(128-colorVal, 0, colorVal+127));
 				}
 				else if(hot){
-					g.setColor(new Color(colorVal, 0, 255-colorVal));
+					g.setColor(new Color(colorVal+127, 0, 128-colorVal));
 				}
 				
 				
@@ -297,8 +306,8 @@ public class Display extends JComponent {
 	
 
 	private void calculateVolateOnScreen() {
-		for(int x = DISPLAY_WIDTH/6 +5; x < DISPLAY_WIDTH*5/6-10; x+=7){
-			for (int y = DISPLAY_HEIGHT/6 +5; y <DISPLAY_HEIGHT*5/6 + DISPLAY_HEIGHT/10-30; y+=7){
+		for(int x = DISPLAY_WIDTH/6 +5; x < DISPLAY_WIDTH*5/6-10; x+=pixel){
+			for (int y = DISPLAY_HEIGHT/6 +5; y <DISPLAY_HEIGHT*5/6 + DISPLAY_HEIGHT/10-30; y+=pixel){
 				voltageValue[x][y] = 0;
 				for(int i = 0; i <ballarray.length; i++){
 					Ball ball = ballarray[i];
@@ -320,8 +329,8 @@ public class Display extends JComponent {
 	}
 
 	private void calculateElectricFieldOnScreen() {
-		for(int x = DISPLAY_WIDTH/6+5; x < DISPLAY_WIDTH*5/6-10; x+=7){
-			for (int y = DISPLAY_HEIGHT/6+5; y <DISPLAY_HEIGHT*5/6 + DISPLAY_HEIGHT/10-30; y+=7){
+		for(int x = DISPLAY_WIDTH/6+5; x < DISPLAY_WIDTH*5/6-10; x+=pixel){
+			for (int y = DISPLAY_HEIGHT/6+5; y <DISPLAY_HEIGHT*5/6 + DISPLAY_HEIGHT/10-30; y+=pixel){
 				electricField[x][y] = new Force();
 				for(int i = 0; i <ballarray.length; i++){
 					Ball ball = ballarray[i];
@@ -426,5 +435,89 @@ public class Display extends JComponent {
 				this.setText("Start");
 			}
 		}
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent a) {
+		int x = a.getX() +5;
+		x-=x%pixel;
+		int y = a.getY() +5;
+		y-=y%pixel;
+		//System.out.println (x + "," +y);
+		
+		//if(voltageValue[x-(x%7)+a][y-(y%7)+a]!=0){
+			
+			System.out.println(voltageValue[x+5][y] + "," + (x-2) + "," + (y));
+			
+			
+			
+			ArrayList<Double> list = makeList(voltageValue);
+			Collections.sort(list);
+			double belowZero = getNegativeAmount(list);
+			double exactlyZero  = getZeroAmount(list);
+			double aboveZero = getPositiveAmount(list);
+			double value = voltageValue[x+5][y];
+			int colorVal = 128;
+			boolean hot = false;
+			
+			
+			if(value<0){
+				colorVal = (int)((belowZero - list.indexOf(value))/belowZero*128);
+				colorVal = Math.min(colorVal, 128);
+				hot = false;
+			
+				
+			}else if(value>0){
+				colorVal = (int)((list.indexOf(value)-belowZero+2)/aboveZero*128);
+				colorVal = Math.min(colorVal, 128);
+				hot = true;
+			}
+			
+			if(!hot){
+				System.out.println(new Color(128-colorVal, 0, colorVal+127));
+				System.out.println("Us: " + list.indexOf(value) + " Zero: "+ belowZero);
+			}
+			else if(hot){
+				System.out.println(new Color(colorVal+127, 0, 128-colorVal));
+			}
+			
+		//}
+		
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }
