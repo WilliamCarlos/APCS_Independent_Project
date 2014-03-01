@@ -5,7 +5,6 @@
  * 
  */
 
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -69,14 +68,14 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		start.setBounds(20, 20, 100, 50);
 		add(start);
 		start.setVisible(true);
-		ballarray = new Ball[2];
+		ballarray = new Ball[3];
 		chargeDisplay = new JLabel[ballarray.length];
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		
 	Ball ball;
 		for (int i = 0; i<1; i++) {
-			for (int j = 0; j<1; j++) {
+			for (int j = 0; j<2; j++) {
 				
 				ball = new Ball(15, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 0, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000));
 				ballarray[i*3+j] = ball;
@@ -99,10 +98,11 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		}
 		
 		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 1, -1, 20, -Math.max(Math.random()*100/1000000, 35/1000000));
-		ballarray[1] = ball;
-		originalX[1] = ballarray[1].x;
-		originalY[1] = ballarray[1].y;
-		chargeDisplay[1] = new JLabel();
+		int a = 2;
+		ballarray[a] = ball;
+		originalX[a] = ballarray[a].x;
+		originalY[a] = ballarray[a].y;
+		chargeDisplay[a] = new JLabel();
 		JLabel temp = chargeDisplay[1];
 		String str = "";
 		str+=(int)(ball.charge*1000000);
