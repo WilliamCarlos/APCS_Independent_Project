@@ -41,7 +41,7 @@ public class Display extends JComponent {
 	Force[][] electricField;
 	double[][] voltageValue;
 	
-	int timeCounter;
+	int timeCounter = -TIME_BETWEEN_REPLOTS;
 	
 
 
