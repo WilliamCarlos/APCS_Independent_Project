@@ -69,7 +69,7 @@ public class Display extends JComponent {
 		for (int i = 0; i<1; i++) {
 			for (int j = 0; j<1; j++) {
 				
-				ball = new Ball(15, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 0, 0, 0, Math.random()*100/1000000);
+				ball = new Ball(15, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 0, 0, 0, Math.max(Math.random()*100/1000000, 20/1000000));
 				ballarray[i*3+j] = ball;
 				originalX[i*3+j] = ballarray[i*3+j].x;
 				originalY[i*3+j] = ballarray[i*3+j].y;
@@ -89,7 +89,7 @@ public class Display extends JComponent {
 
 		}
 		
-		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 1, -1, 20, -Math.random()*300/1000000);
+		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 1, -1, 20, -Math.max(Math.random()*300/1000000, 35/1000000));
 		ballarray[1] = ball;
 		originalX[1] = ballarray[1].x;
 		originalY[1] = ballarray[1].y;
@@ -119,6 +119,7 @@ public class Display extends JComponent {
 		g.setColor(Color.BLUE);
 
 		start.repaint();
+		drawVoltageGrid(g);
 
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,  RenderingHints.VALUE_ANTIALIAS_ON);
 		if (paintloop) {
@@ -185,15 +186,14 @@ public class Display extends JComponent {
 			}
 		}
 		
-		System.out.println(DISPLAY_WIDTH);
-		System.out.println(timeCounter);
+		
 		if(timeCounter%2000==0){
 		calculateElectricFieldOnScreen();
 		calculateVolateOnScreen();
 		printVoltages();
 		
 		}
-		drawVoltageGrid(g);
+		
 		
 	}
 	
