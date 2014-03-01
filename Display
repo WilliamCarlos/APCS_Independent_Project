@@ -11,6 +11,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -34,6 +36,7 @@ public class Display extends JComponent {
 	double[] originalY = new double[100];
 	private StartButton start;
 	JLabel[] chargeDisplay;
+	
 
 
 	public Display(int width, int height, JFrame frame) {
@@ -52,6 +55,7 @@ public class Display extends JComponent {
 		start.setVisible(true);
 		ballarray = new Ball[3];
 		chargeDisplay = new JLabel[ballarray.length];
+		
 	Ball ball;
 		for (int i = 0; i<1; i++) {
 			for (int j = 0; j<2; j++) {
@@ -74,7 +78,7 @@ public class Display extends JComponent {
 			}
 
 		}
-		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 1, -1, 20, -Math.random()/1);
+		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 1, -1, 20, Math.random()/1);
 		ballarray[2] = ball;
 		originalX[2] = ballarray[2].x;
 		originalY[2] = ballarray[2].y;
@@ -143,7 +147,7 @@ public class Display extends JComponent {
 					Ball temp2 = ballarray[j];
 
 					temp.force.add(CalculateForce(ballarray[j], ballarray[k]));
-					System.out.println(ballarray[0].force);
+					System.out.println("Calced: " + j + " on: " + k);
 				}
 			}
 		}
@@ -160,6 +164,7 @@ public class Display extends JComponent {
 			}
 			ballarray[i].draw(g);
 			updateJLabel(chargeDisplay[i], i);
+		
 		}
 		if (xdif!= 0 || ydif!=0) {
 			for (int i = 0; i<ballarray.length; i++) {
