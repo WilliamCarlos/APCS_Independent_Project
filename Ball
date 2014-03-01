@@ -16,7 +16,7 @@ public class Ball {
 		y = Y;
 		dx = dirx;
 		dy = diry;
-		mass = Math.pow(getRadius(), 2)/10000;
+		mass = Math.pow(getRadius(), 2)/500000;
 		//double angle = 2 * Math.PI * Math.random();  // Random direction.
 		speed = sped+Math.random()/100;    // Random speed.
 		dx = 1 * speed;
