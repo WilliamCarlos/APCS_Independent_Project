@@ -8,6 +8,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,10 +23,11 @@ import javax.swing.JLabel;
 
 public class Display extends JComponent {
 	public double k = 9*Math.pow(10, 9);
+	double permitivity_of_free_space = 8.85418782 * Math.pow(10, -12);
 	public int DISPLAY_WIDTH;   
 	public int DISPLAY_HEIGHT;
 	private boolean paintloop = true;
-	int TIME_BETWEEN_REPLOTS = 5;
+	int TIME_BETWEEN_REPLOTS = 50;
 	Ball[] ballarray;
 	int xdif = 0;
 	int ydif = 0;
@@ -36,12 +38,19 @@ public class Display extends JComponent {
 	double[] originalY = new double[100];
 	private StartButton start;
 	JLabel[] chargeDisplay;
+	Force[][] electricField;
+	double[][] voltageValue;
+	
+	int timeCounter;
 	
 
 
 	public Display(int width, int height, JFrame frame) {
 		DISPLAY_WIDTH = width;
 		DISPLAY_HEIGHT = height; 
+		electricField = new Force[DISPLAY_WIDTH][DISPLAY_HEIGHT];
+		voltageValue = new double[DISPLAY_WIDTH][DISPLAY_HEIGHT];
+	
 		f = frame; 
 		init();
 	}
@@ -60,7 +69,7 @@ public class Display extends JComponent {
 		for (int i = 0; i<1; i++) {
 			for (int j = 0; j<2; j++) {
 				
-				ball = new Ball(20, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 1, -1, 20, Math.random()/100);
+				ball = new Ball(20, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 1, -1, 20, -Math.random()/10000);
 				ballarray[i*3+j] = ball;
 				originalX[i*3+j] = ballarray[i*3+j].x;
 				originalY[i*3+j] = ballarray[i*3+j].y;
@@ -68,7 +77,8 @@ public class Display extends JComponent {
 				JLabel temp = chargeDisplay[i*3+j];
 				
 				String str = "";
-				str+=ball.acceleration;
+				str+=(int)(ball.charge*1000000);
+				str+="µC";
 				temp.setText(str);
 				temp.setBounds((int)ball.x, (int)ball.y, 50, 25);
 				add(temp);
@@ -78,14 +88,15 @@ public class Display extends JComponent {
 			}
 
 		}
-		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 1, -1, 20, Math.random()/1);
+		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 1, -1, 20, Math.random()/2500);
 		ballarray[2] = ball;
 		originalX[2] = ballarray[2].x;
 		originalY[2] = ballarray[2].y;
 		chargeDisplay[2] = new JLabel();
 		JLabel temp = chargeDisplay[2];
 		String str = "";
-		str+=ball.acceleration;
+		str+=(int)(ball.charge*1000000);
+		str+="µC";
 		temp.setText(str);
 		temp.setBounds((int)ball.x, (int)ball.y, 50, 25);
 		add(temp);
@@ -112,6 +123,7 @@ public class Display extends JComponent {
 		if (paintloop) {
 			try {
 				Thread.sleep(TIME_BETWEEN_REPLOTS);
+				timeCounter+=TIME_BETWEEN_REPLOTS;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -172,12 +184,163 @@ public class Display extends JComponent {
 			}
 		}
 		
+		System.out.println(DISPLAY_WIDTH);
+		System.out.println(timeCounter);
+		if(timeCounter%2000==0){
+		calculateElectricFieldOnScreen();
+		calculateVolateOnScreen();
+		printVoltages();
+		
+		}
+		drawVoltageGrid(g);
+		
 	}
 	
+	private void printVoltages() {
+		for(int x = 0; x <DISPLAY_WIDTH; x++){
+			for (int y = 0; y < DISPLAY_HEIGHT; y++){
+				double v = voltageValue[x][y];
+				if (v!=0){
+					System.out.println("X: " + x + " Y: " + y + " V: " + v);
+				}
+			}
+		}
+		
+	}
+
+	private void drawVoltageGrid(Graphics g) {
+		double max = getMax(voltageValue);
+		double min = getMin(voltageValue);
+		System.out.println("JJJJJJJJJJJJJJJJJJJJJ " + max);
+		for(int x = DISPLAY_WIDTH/6; x < DISPLAY_WIDTH*5/6; x+=10){
+			for (int y = DISPLAY_WIDTH/6; y <DISPLAY_HEIGHT*5/6; y+=10){
+				double value = voltageValue[x][y];
+				g.setColor(getBackground());
+				if(value>0){
+					g.setColor(Color.red);
+				}
+				if(value>max/50){
+					g.setColor(Color.white);
+				}if(value>max/25){
+					g.setColor(Color.lightGray);
+				}
+				if(value>max/15){
+					g.setColor(Color.pink);
+				}
+				if(value>max/10){
+					g.setColor(Color.yellow);
+				}if(value>max/5){
+					g.setColor(Color.green);
+				}
+				if(value>max/2){
+					g.setColor(Color.CYAN);
+				}
+				
+				if(value<0){
+					g.setColor(Color.red);
+				}
+				if(value<min/50){
+					g.setColor(Color.pink);
+				}if(value<min/25){
+					g.setColor(Color.orange);
+				}
+				if(value<min/15){
+					g.setColor(Color.magenta);
+				}
+				if(value<min/10){
+					g.setColor(Color.gray);
+				}if(value<min/5){
+					g.setColor(Color.DARK_GRAY);
+				}
+				if(value<min/2){
+					g.setColor(Color.black);
+				}	
+				g.fillRect(x, y, 10, 10);
+			}
+			}
+		
+	}
+
+	private double getMin(double[][] a) {
+		double min = 999999;
+		for(int i = 0; i < DISPLAY_WIDTH; i++){
+			for(int j = 0; j <DISPLAY_HEIGHT; j++){
+				if (a[i][j]<min){
+					System.out.println("MIN: " +  a[i][j]);
+					
+					min = a[i][j];
+				}
+			}
+		}
+		return min;
+	}
+
+	private double getMax(double[][] a) {
+		double max = -999999;
+		for(int i = 0; i < DISPLAY_WIDTH; i++){
+			for(int j = 0; j <DISPLAY_HEIGHT; j++){
+				if (a[i][j]>max){
+					System.out.println("MAX: " +  a[i][j]);
+					
+					max = a[i][j];
+				}
+			}
+		}
+		return max;
+	}
+
+	private void calculateVolateOnScreen() {
+		for(int x = DISPLAY_WIDTH/6; x < DISPLAY_WIDTH*5/6; x+=10){
+			for (int y = DISPLAY_WIDTH/6; y <DISPLAY_HEIGHT*5/6; y+=10){
+				voltageValue[x][y] = 0;
+				for(int i = 0; i <ballarray.length; i++){
+					Ball ball = ballarray[i];
+					voltageValue[x][y] += calculateVoltage(ball, new Point(x, y));
+				}
+			}
+			}
+		
+	}
+
+	private double calculateVoltage(Ball ball, Point point) {
+		return ball.charge/distance(ball.x, ball.y, point.x, point.y)*(1/(4*Math.PI*permitivity_of_free_space));
+		
+	}
+
+	private double distance(double x, double y, int x2, int y2) {
+		return Math.pow(Math.pow(x - x2, 2) + Math.pow(y - y2, 2), 0.5);
+		
+	}
+
+	private void calculateElectricFieldOnScreen() {
+		for(int x = DISPLAY_WIDTH/6; x < DISPLAY_WIDTH*5/6; x+=10){
+			for (int y = DISPLAY_WIDTH/6; y <DISPLAY_HEIGHT*5/6; y+=10){
+				electricField[x][y] = new Force();
+				for(int i = 0; i <ballarray.length; i++){
+					Ball ball = ballarray[i];
+					
+					electricField[x][y].add(
+							calculateElectricField(ball,  new Point (x, y)));
+				}
+			}
+		}
+		
+	}
+
+	private Force calculateElectricField(Ball ball, Point point) {
+		double magnitude = ball.charge*k;
+		magnitude/=distanceSquared(ball, new Ball(0, point.x, point.y, 0, 0, 0, 0));
+		// Only thing that matters for distanceSquared is the x and y coords, 
+		//thus all the rest can be 0s.
+		double theta = calculateTheta(ball, new Ball(0, point.x, point.y, 0, 0, 0, 0));
+		return new Force(magnitude, theta);
+	}
+
 	private void updateJLabel(JLabel jLabel, int i) {
 	
 		String str = "";
-		str+=ballarray[i].acceleration;
+		str+=(int)(ballarray[i].charge*1000000);
+		str+="µC";
 		jLabel.setText(str);
 		jLabel.setBounds((int)ballarray[i].x, (int)ballarray[i].y, 50, 25);
 		add(jLabel);
