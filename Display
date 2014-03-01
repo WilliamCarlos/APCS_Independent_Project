@@ -125,7 +125,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 
 		}
 		
-		ball = new Ball(15, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 0, 0, 0, -Math.max(Math.random()*100/1000000, 35/1000000));
+		ball = new Ball(40, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 0, 0, 0, -Math.max(Math.random()*100/1000000, 35/1000000));
 		int a = 6;
 		ballarray[a] = ball;
 		originalX[a] = ballarray[a].x;
@@ -236,17 +236,16 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		
 		}
 		
+		/*
 		if(timeCounter%1000==0){
 			updateVoltageScaleText();
 		}
-		
+		*/
 		
 	}
 	
-	private void updateVoltageScaleText() {
-		ArrayList<Double> list = makeList(voltageValue);
-		Collections.sort(list);
-		
+	private void updateVoltageScaleText(ArrayList<Double> list) {
+			
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html> Max: ");
 		sb.append("<br>");
@@ -287,7 +286,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		sb.append("<br>");
 		try{
 			Double n = list.get(0);
-			System.out.println("DDDDD" + list.get(0));
+			
 			int numZerosToAdd = 0;
 			if(Math.abs(n)>=999){
 				while(Math.abs(n)>=10){
@@ -374,6 +373,8 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 				g.fillRect(x, y, 7, 7);
 			}
 			}
+		
+		updateVoltageScaleText(list);
 		
 	}
 	
