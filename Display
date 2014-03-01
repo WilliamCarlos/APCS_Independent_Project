@@ -5,11 +5,13 @@
  * 
  */
 
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -128,7 +130,10 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		g.setColor(Color.BLUE);
 
 		start.repaint();
+		
+		
 		drawVoltageGrid(g);
+		drawVoltageScale(g);
 
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,  RenderingHints.VALUE_ANTIALIAS_ON);
 		if (paintloop) {
@@ -196,7 +201,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		}
 		
 		
-		if(timeCounter%700==0){
+		if(timeCounter%50==0){
 		//calculateElectricFieldOnScreen();
 		calculateVolateOnScreen();
 		//printVoltages();
@@ -260,6 +265,8 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 			}
 		
 	}
+	
+	
 
 	private int getZeroAmount(ArrayList<Double> list) {
 		int counter = 0;
@@ -304,6 +311,48 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		return retval;
 	}
 
+	
+	private void drawVoltageScale(Graphics g){
+		int x = 675;
+		int y = 110;
+		int width = 50;
+		int height = 1;
+		double length = 150;
+		//For hot:
+	for(double i = length; i >=0; i--){
+		int colorVal = (int) (i/length*128);
+		g.setColor(new Color(colorVal+127, 0, 128-colorVal));
+		colorVal = Math.min(colorVal, 128);
+		g.fillRect(x, (int) (y+length-i), width, height);
+	}
+	for(double i = 1; i <=length; i++){
+		int colorVal = (int) (i/length*128);
+		g.setColor(new Color(128-colorVal, 0, colorVal+127));
+		colorVal = Math.min(colorVal, 128);
+		g.fillRect(x, (int) (y+length+i), width, height);
+	}
+		
+		int colorVal = 128;
+//		boolean hot = false;
+//		if(value<0){
+//			colorVal = (int)((belowZero - list.indexOf(value))/belowZero*128);
+//			colorVal = Math.min(colorVal, 128);
+//			hot = false;
+//		
+//			
+//		}else if(value>0){
+//			colorVal = (int)((list.indexOf(value)-belowZero+2)/aboveZero*128);
+//			colorVal = Math.min(colorVal, 128);
+//			hot = true;
+//		}
+		
+//		if(!hot){
+//			g.setColor(new Color(128-colorVal, 0, colorVal+127));
+//		}
+//		else if(hot){
+//			g.setColor(new Color(colorVal+127, 0, 128-colorVal));
+//		}
+	}
 	
 
 	private void calculateVolateOnScreen() {
@@ -452,6 +501,13 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 
 	@Override
 	public void mouseMoved(MouseEvent a) {
+	
+		
+		/*
+		 * 
+		 * Only temp comment out.
+		
+		
 		int x = a.getX() +5;
 		x-=x%pixel;
 		int y = a.getY() +5;
@@ -495,12 +551,24 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 			}
 			
 		//}
-		
+		 * 
+		 * 
+		 * 
+		*/
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+	public void mouseClicked(MouseEvent a) {
+		System.out.println("X: " + a.getX() + " Y: " + a.getY());
+		
+		try {
+			Robot robot = new Robot();
+			System.out.println(robot.getPixelColor(a.getX(), a.getY()));
+		} catch (AWTException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 	}
 
