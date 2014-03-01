@@ -1,11 +1,12 @@
 import java.awt.Graphics;
+import java.awt.geom.Line2D;
 
 
 public class Ball {
 	public double x, y, mySize, mass, dx, dy, speed, charge, acceleration, accelerationD;
 	public boolean hitWall;
 	public Force force = new Force();
-	
+	Line2D.Double forceVector;
 
 
 	public Ball (double size, double X, double Y, double dirx, double diry, double sped, double charge) {
@@ -36,6 +37,8 @@ public class Ball {
 	public void update(Graphics g, int width, int height, int tickLength) {
 		wallcollisions(width, height);
 		updateAcceleration();
+		updateForceVector();
+		g.drawLine((int)forceVector.x1, (int)forceVector.y1, (int)forceVector.x2, (int)forceVector.y2);
 		dx+=Math.cos(accelerationD)*acceleration*tickLength/1000;
 		dy+=Math.sin(accelerationD)*acceleration*tickLength/1000;
 		x = x+dx*tickLength/1000;
@@ -45,6 +48,12 @@ public class Ball {
 	public void updateAcceleration() {
 		acceleration = force.magnitude/mass;
 		accelerationD = force.direction;
+	}
+	public void updateForceVector(){
+		forceVector = new Line2D.Double(x, y, x +
+				Math.cos(force.direction)*force.magnitude,
+				y + Math.sin(force.direction)*force.magnitude);
+		
 	}
 
 	public void wallcollisions(int width, int height) {
