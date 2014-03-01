@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -161,7 +162,7 @@ public class Display extends JComponent {
 					Ball temp2 = ballarray[j];
 
 					temp.force.add(CalculateForce(ballarray[j], ballarray[k]));
-					System.out.println("Calced: " + j + " on: " + k);
+					//System.out.println("Calced: " + j + " on: " + k);
 				}
 			}
 		}
@@ -187,10 +188,10 @@ public class Display extends JComponent {
 		}
 		
 		
-		if(timeCounter%2000==0){
-		calculateElectricFieldOnScreen();
+		if(timeCounter%700==0){
+		//calculateElectricFieldOnScreen();
 		calculateVolateOnScreen();
-		printVoltages();
+		//printVoltages();
 		
 		}
 		
@@ -202,7 +203,7 @@ public class Display extends JComponent {
 			for (int y = 0; y < DISPLAY_HEIGHT; y++){
 				double v = voltageValue[x][y];
 				if (v!=0){
-					System.out.println("X: " + x + " Y: " + y + " V: " + v);
+				//	System.out.println("X: " + x + " Y: " + y + " V: " + v);
 				}
 			}
 		}
@@ -210,85 +211,90 @@ public class Display extends JComponent {
 	}
 
 	private void drawVoltageGrid(Graphics g) {
-		double max = getMax(voltageValue);
-		double min = getMin(voltageValue);
-		System.out.println("JJJJJJJJJJJJJJJJJJJJJ " + max);
+		ArrayList<Double> list = makeList(voltageValue);
+		Collections.sort(list);
+		double belowZero = getNegativeAmount(list);
+		double exactlyZero  = getZeroAmount(list);
+		double aboveZero = getPositiveAmount(list);
+		
+	//	System.out.println("JJJJJJJJJJJJJJJJJJJJJ " + max);
 		for(int x = DISPLAY_WIDTH/6 +5; x < DISPLAY_WIDTH*5/6 -10; x+=7){
 			for (int y = DISPLAY_HEIGHT/6+5; y <DISPLAY_HEIGHT*5/6 + DISPLAY_HEIGHT/10 -30; y+=7){
 				double value = voltageValue[x][y];
 				g.setColor(getBackground());
-				if(value>0){
-					g.setColor(Color.red);
-				}
-				if(value>max/50){
-					g.setColor(Color.white);
-				}if(value>max/25){
-					g.setColor(Color.lightGray);
-				}
-				if(value>max/15){
-					g.setColor(Color.pink);
-				}
-				if(value>max/10){
-					g.setColor(Color.yellow);
-				}if(value>max/5){
-					g.setColor(Color.green);
-				}
-				if(value>max/2){
-					g.setColor(Color.CYAN);
-				}
+				int colorVal = 255;
+				boolean hot = false;
+				
 				
 				if(value<0){
-					g.setColor(Color.red);
+					colorVal = (int)(list.indexOf(value)/belowZero*255);
+					hot = false;
+					System.out.println(colorVal);
+					
+				}else if(value>0){
+					colorVal = (int)((list.indexOf(value)-belowZero-exactlyZero)/aboveZero*255);
+					
+					hot = true;
 				}
-				if(value<min/50){
-					g.setColor(Color.pink);
-				}if(value<min/25){
-					g.setColor(Color.orange);
+				
+				if(!hot){
+					g.setColor(new Color(255-colorVal, 0, colorVal));
 				}
-				if(value<min/15){
-					g.setColor(Color.magenta);
+				else if(hot){
+					g.setColor(new Color(colorVal, 0, 255-colorVal));
 				}
-				if(value<min/10){
-					g.setColor(Color.gray);
-				}if(value<min/5){
-					g.setColor(Color.DARK_GRAY);
-				}
-				if(value<min/2){
-					g.setColor(Color.black);
-				}	
-				g.fillRect(x, y, 10, 10);
+				
+				
+				g.fillRect(x, y, 7, 7);
 			}
 			}
 		
 	}
 
-	private double getMin(double[][] a) {
-		double min = 999999;
-		for(int i = 0; i < DISPLAY_WIDTH; i++){
-			for(int j = 0; j <DISPLAY_HEIGHT; j++){
-				if (a[i][j]<min){
-					System.out.println("MIN: " +  a[i][j]);
-					
-					min = a[i][j];
-				}
+	private int getZeroAmount(ArrayList<Double> list) {
+		int counter = 0;
+		for(int i = 0; i < list.size(); i++){
+			if(list.get(i)==0){
+				counter++;
 			}
 		}
-		return min;
+		return counter;
 	}
 
-	private double getMax(double[][] a) {
-		double max = -999999;
-		for(int i = 0; i < DISPLAY_WIDTH; i++){
-			for(int j = 0; j <DISPLAY_HEIGHT; j++){
-				if (a[i][j]>max){
-					System.out.println("MAX: " +  a[i][j]);
-					
-					max = a[i][j];
+	private int getPositiveAmount(ArrayList<Double> list) {
+		int counter = 0;
+		for(int i = 0; i < list.size(); i++){
+			if(list.get(i)>0){
+				counter++;
+			}
+		}
+		return counter;
+	}
+
+	private int getNegativeAmount(ArrayList<Double> list) {
+		int counter = 0;
+		for(int i = 0; i < list.size(); i++){
+			if(list.get(i)<0){
+				counter++;
+			}
+		}
+		return counter;
+	}
+
+	private ArrayList<Double> makeList(double[][] a) {
+		ArrayList<Double> retval = new ArrayList<Double>();
+		for(int i = 0; i < a.length; i++){
+			for (int j = 0; j < a[i].length; j++){
+				if(a[i][j]!=0){
+					retval.add(a[i][j]);
 				}
 			}
 		}
-		return max;
+		
+		return retval;
 	}
+
+	
 
 	private void calculateVolateOnScreen() {
 		for(int x = DISPLAY_WIDTH/6 +5; x < DISPLAY_WIDTH*5/6-10; x+=7){
