@@ -125,13 +125,13 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 
 		}
 		
-		ball = new Ball(40, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 0, 0, 0, -Math.max(Math.random()*100/1000000, 35/1000000));
+		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 0, 0, 0, -Math.max(Math.random()*100/1000000, 35/1000000));
 		int a = 6;
 		ballarray[a] = ball;
 		originalX[a] = ballarray[a].x;
 		originalY[a] = ballarray[a].y;
 		chargeDisplay[a] = new JLabel();
-		JLabel temp = chargeDisplay[1];
+		JLabel temp = chargeDisplay[a];
 		String str = "";
 		str+=(int)(ball.charge*1000000);
 		str+="µC";
@@ -242,8 +242,37 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		}
 		*/
 		
+		printSigmaKineticEnergyAndElectric();
+		
 	}
 	
+	private void printSigmaKineticEnergyAndElectric() {
+		double totE = 0;
+		for(Ball b : ballarray){
+			totE+=Math.pow(b.getSpeed() , 2)*b.mass*0.5;
+		}
+		
+		for(int k = 0; k <ballarray.length; k++){
+
+
+			Ball temp = ballarray[k];
+
+			for(int j = 0; j <ballarray.length; j++){
+				if(k!=j){
+					Ball temp2 = ballarray[j];
+
+					totE+=(CalculatePotentialEnergy(ballarray[j], ballarray[k]));
+					
+				}}}
+		System.out.println(totE);
+		
+	}
+
+	private double CalculatePotentialEnergy(Ball ball, Ball ball2) {
+		
+		return k*ball.charge*ball2.charge/distance(ball.x, ball2.x, ball.y, ball2.y);
+	}
+
 	private void updateVoltageScaleText(ArrayList<Double> list) {
 			
 		StringBuilder sb = new StringBuilder();
@@ -462,11 +491,11 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	}
 
 	private double calculateVoltage(Ball ball, Point point) {
-		return ball.charge/distance(ball.x, ball.y, point.x, point.y)*(1/(4*Math.PI*permitivity_of_free_space));
+		return ball.charge/distance(ball.x, ball.y, point.x, point.y)/(4*Math.PI*permitivity_of_free_space);
 		
 	}
 
-	private double distance(double x, double y, int x2, int y2) {
+	private double distance(double x, double y, double x2, double y2) {
 		return Math.pow(Math.pow(x - x2, 2) + Math.pow(y - y2, 2), 0.5);
 		
 	}
@@ -596,7 +625,10 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	public void mouseMoved(MouseEvent a) {
 	
 		
-		
+		/*
+		 * 
+		 * temp commented out
+		 * 		 
 		
 		
 		int x = a.getX() +5;
@@ -642,7 +674,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 			}
 			
 		
-		 
+		 */
 	}
 
 	@Override
