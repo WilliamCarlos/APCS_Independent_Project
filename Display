@@ -49,8 +49,8 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	
 	int voltageBarLength = 300;
 	int voltageBarWidth = 50;
-	int voltageBarX = 675;
-	int voltageBarY = 110;
+	int voltageBarX;
+	int voltageBarY;
 	JLabel voltageBarMax;
 	//JLabel voltageBarMid;
 	JLabel voltageBarMin;
@@ -63,10 +63,12 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 
 
 	public Display(int width, int height, JFrame frame) {
-		DISPLAY_WIDTH = width;
-		DISPLAY_HEIGHT = height; 
-		electricField = new Force[DISPLAY_WIDTH][DISPLAY_HEIGHT];
-		voltageValue = new double[DISPLAY_WIDTH][DISPLAY_HEIGHT];
+		this.DISPLAY_WIDTH = width;
+		this.DISPLAY_HEIGHT = height; 
+		this.voltageBarX = DISPLAY_WIDTH/20;
+		this.voltageBarY = DISPLAY_HEIGHT/6 + DISPLAY_HEIGHT/100;
+		this.electricField = new Force[DISPLAY_WIDTH][DISPLAY_HEIGHT];
+		this.voltageValue = new double[DISPLAY_WIDTH][DISPLAY_HEIGHT];
 	
 		f = frame; 
 		init();
@@ -76,7 +78,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		setSize(DISPLAY_WIDTH, DISPLAY_HEIGHT);
 		paintloop = true;
 		start = new StartButton();
-		start.setBounds(20, 20, 100, 50);
+		start.setBounds(DISPLAY_HEIGHT/9, DISPLAY_WIDTH/20, 100, 50);
 		add(start);
 		start.setVisible(true);
 		ballarray = new Ball[7];
