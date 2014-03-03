@@ -65,7 +65,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	public Display(int width, int height, JFrame frame) {
 		this.DISPLAY_WIDTH = width;
 		this.DISPLAY_HEIGHT = height; 
-		this.voltageBarX = DISPLAY_WIDTH/20;
+		this.voltageBarX = (int)(DISPLAY_WIDTH/1.18);
 		this.voltageBarY = DISPLAY_HEIGHT/6 + DISPLAY_HEIGHT/100;
 		this.electricField = new Force[DISPLAY_WIDTH][DISPLAY_HEIGHT];
 		this.voltageValue = new double[DISPLAY_WIDTH][DISPLAY_HEIGHT];
