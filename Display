@@ -33,7 +33,8 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	public int DISPLAY_WIDTH;   
 	public int DISPLAY_HEIGHT;
 	private boolean paintloop = true;
-	int TIME_BETWEEN_REPLOTS = 1;
+	int TIME_BETWEEN_REPLOTS = 50;
+	
 	Ball[] ballarray;
 	int xdif = 0;
 	int ydif = 0;
