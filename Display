@@ -35,7 +35,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	public int DISPLAY_HEIGHT;
 	private boolean paintloop = true;
 	int TIME_BETWEEN_REPLOTS = 50;
-	
+
 	Ball[] ballarray;
 	int xdif = 0;
 	int ydif = 0;
@@ -48,7 +48,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	JLabel[] chargeDisplay;
 	Force[][] electricField;
 	double[][] voltageValue;
-	
+
 	int voltageBarLength = 300;
 	int voltageBarWidth = 50;
 	int voltageBarX;
@@ -56,12 +56,16 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	JLabel voltageBarMax;
 	//JLabel voltageBarMid;
 	JLabel voltageBarMin;
-	
+
 	String voltageOnMouse = "";
 	int pixel =7;
-	
+
 	int timeCounter = -TIME_BETWEEN_REPLOTS;
-	
+	boolean ballsMoving = true;
+	boolean voltageCalcing = true;
+	boolean drawVoltage = voltageCalcing;
+	boolean drawBalls = ballsMoving;
+
 
 
 	public Display(int width, int height, JFrame frame) {
@@ -71,7 +75,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		this.voltageBarY = DISPLAY_HEIGHT/6 + DISPLAY_HEIGHT/100;
 		this.electricField = new Force[DISPLAY_WIDTH][DISPLAY_HEIGHT];
 		this.voltageValue = new double[DISPLAY_WIDTH][DISPLAY_HEIGHT];
-	
+
 		f = frame; 
 		init();
 	}
@@ -87,48 +91,48 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		chargeDisplay = new JLabel[ballarray.length];
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		
-		
+
+
 		voltageBarMax = new JLabel("MAX");
 		voltageBarMax.setBounds(voltageBarX + 55, voltageBarY-25, 50, 75);
 		add(voltageBarMax);
 		voltageBarMax.setVisible(true);
-		
+
 		/*
 		voltageBarMid = new JLabel("MID");
 		voltageBarMid.setBounds(voltageBarX + 55, voltageBarY+voltageBarLength/2-25, 50, 75);
 		add(voltageBarMid);
 		voltageBarMid.setVisible(true);
-		*/
+		 */
 		voltageBarMin = new JLabel("MIN");
 		voltageBarMin.setBounds(voltageBarX + 55, voltageBarY + voltageBarLength-50, 50, 75);
 		add(voltageBarMin);
 		voltageBarMin.setVisible(true);
-		
-	Ball ball;
+
+		Ball ball;
 		for (int i = 0; i<2; i++) {
 			for (int j = 0; j<3; j++) {
-				
+
 				ball = new Ball(15, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 0, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000));
 				ballarray[i*3+j] = ball;
 				originalX[i*3+j] = ballarray[i*3+j].x;
 				originalY[i*3+j] = ballarray[i*3+j].y;
 				chargeDisplay[i*3+j] = new JLabel();
 				JLabel temp = chargeDisplay[i*3+j];
-				
+
 				String str = "";
 				str+=(int)(ball.charge*1000000);
-				str+="µC";
+				str+="ÂµC";
 				temp.setText(str);
 				temp.setBounds((int)ball.x, (int)ball.y, 50, 25);
 				add(temp);
-			    temp.setVisible(true);
-				
-				
+				temp.setVisible(true);
+
+
 			}
 
 		}
-		
+
 		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 0, 0, 0, -Math.max(Math.random()*100/1000000, 35/1000000));
 		int a = 6;
 		ballarray[a] = ball;
@@ -138,11 +142,11 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		JLabel temp = chargeDisplay[a];
 		String str = "";
 		str+=(int)(ball.charge*1000000);
-		str+="µC";
+		str+="ÂµC";
 		temp.setText(str);
 		temp.setBounds((int)ball.x, (int)ball.y, 50, 25);
 		add(temp);
-	    temp.setVisible(true);
+		temp.setVisible(true);
 
 
 		repaint();
@@ -160,11 +164,10 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		g.setColor(Color.BLUE);
 
 		start.repaint();
+
+
 		
-		
-		drawVoltageGrid(g);
-		drawVoltageScale(g);
-		
+
 
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,  RenderingHints.VALUE_ANTIALIAS_ON);
 		if (paintloop) {
@@ -175,15 +178,27 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 				e.printStackTrace();
 			}
 
-			onloop(g);
-			
-
+			if(ballsMoving) {
+				ballMovement(g);
+			}
+			if(voltageCalcing){
+				calcVoltage();
+			}
+			if(drawVoltage){
+				drawVoltageGrid(g);
+				drawVoltageScale(g);
+			}
+			if(drawBalls){
+				for(int i = 0; i<ballarray.length; i++) {
+					ballarray[i].draw(g);
+					updateJLabel(chargeDisplay[i], i);
+				}
+				
+			}
 			repaint();
 		}
 
-		for(int i = 0; i<ballarray.length; i++) {
-			ballarray[i].draw(g);
-		}
+		
 
 		repaint();
 	}
@@ -192,7 +207,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		paintloop = !paintloop;
 	}
 
-	public void onloop(Graphics g) {
+	public void ballMovement(Graphics g) {
 
 		for(int k = 0; k <ballarray.length; k++){
 
@@ -222,40 +237,44 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 					ballarray[i].y+=ydif;
 				}
 			}
-			ballarray[i].draw(g);
-			updateJLabel(chargeDisplay[i], i);
-		
+			
+			
+
 		}
 		if (xdif!= 0 || ydif!=0) {
 			for (int i = 0; i<ballarray.length; i++) {
 				ballarray[i].speed*=Math.sqrt(lastvolume/volume);
 			}
 		}
+
+
 		
-		
+
+	}
+	
+	public void calcVoltage(){
 		if(timeCounter%50==0){
-		//calculateElectricFieldOnScreen();
-		calculateVolateOnScreen();
-		//printVoltages();
-		
+			//calculateElectricFieldOnScreen();
+			calculateVolateOnScreen();
+			//printVoltages();
+
 		}
-		
+
 		/*
 		if(timeCounter%1000==0){
 			updateVoltageScaleText();
 		}
-		*/
-		
+		 */
+
 		printSigmaKineticEnergyAndElectric();
-		
 	}
-	
+
 	private void printSigmaKineticEnergyAndElectric() {
 		double totE = 0;
 		for(Ball b : ballarray){
 			totE+=Math.pow(b.getSpeed() , 2)*b.mass*0.5;
 		}
-		
+
 		for(int k = 0; k <ballarray.length; k++){
 
 
@@ -266,19 +285,19 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 					Ball temp2 = ballarray[j];
 
 					totE+=(CalculatePotentialEnergy(ballarray[j], ballarray[k]));
-					
+
 				}}}
-		System.out.println(totE);
-		
+		//System.out.println(totE);
+
 	}
 
 	private double CalculatePotentialEnergy(Ball ball, Ball ball2) {
-		
+
 		return k*ball.charge*ball2.charge/distance(ball.x, ball2.x, ball.y, ball2.y);
 	}
 
 	private void updateVoltageScaleText(ArrayList<Double> list) {
-			
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html> Max: ");
 		sb.append("<br>");
@@ -297,61 +316,61 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 					numZerosToAdd--;
 				}
 			}
-		sb.append(n.toString().substring(0, 5));
-		
-		if(numZerosToAdd!=0){
-			sb.append("<br>");
-			sb.append("E ");
-			sb.append(numZerosToAdd);
-		}
-		
-		
+			sb.append(n.toString().substring(0, 5));
+
+			if(numZerosToAdd!=0){
+				sb.append("<br>");
+				sb.append("E ");
+				sb.append(numZerosToAdd);
+			}
+
+
 		}
 		catch(IndexOutOfBoundsException e){
-			
+
 		}
-		
+
 		voltageBarMax.setText(sb.toString());
-		
-		
+
+
 		sb = new StringBuilder();
 		sb.append("<html> Min: ");
 		sb.append("<br>");
 		try{
 			Double n = list.get(0);
-			
+
 			int numZerosToAdd = 0;
 			if(Math.abs(n)>=999){
 				while(Math.abs(n)>=10){
 					n/=10;
 					numZerosToAdd++;
-				
+
 				}
 			}
 			else if(Math.abs(n)<.1){
 				while(Math.abs(n)<10){
 					n*=10;
 					numZerosToAdd--;
-					
-					
+
+
 				}
 			}
-		sb.append(n.toString().substring(0, 5));
-		
-		if(numZerosToAdd!=0){
-			sb.append("<br>");		
-			sb.append("E ");
-			sb.append(numZerosToAdd);
-		}
-		
-		
+			sb.append(n.toString().substring(0, 5));
+
+			if(numZerosToAdd!=0){
+				sb.append("<br>");		
+				sb.append("E ");
+				sb.append(numZerosToAdd);
+			}
+
+
 		}
 		catch(IndexOutOfBoundsException e){
-			
+
 		}
-		
+
 		voltageBarMin.setText(sb.toString());
-		
+
 	}
 
 	private void printVoltages() {
@@ -359,11 +378,11 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 			for (int y = 0; y < DISPLAY_HEIGHT; y++){
 				double v = voltageValue[x][y];
 				if (v!=0){
-				//	System.out.println("X: " + x + " Y: " + y + " V: " + v);
+					//	System.out.println("X: " + x + " Y: " + y + " V: " + v);
 				}
 			}
 		}
-		
+
 	}
 
 	private void drawVoltageGrid(Graphics g) {
@@ -372,46 +391,46 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		double belowZero = getNegativeAmount(list);
 		double exactlyZero  = getZeroAmount(list);
 		double aboveZero = getPositiveAmount(list);
-	
-		
-		
+
+
+
 		for(int x = DISPLAY_WIDTH/6 +5; x < DISPLAY_WIDTH*5/6 -10; x+=pixel){
 			for (int y = DISPLAY_HEIGHT/6+5; y <DISPLAY_HEIGHT*5/6 + DISPLAY_HEIGHT/10 -30; y+=pixel){
 				double value = voltageValue[x][y];
 				g.setColor(Color.black);
 				int colorVal = 128;
 				boolean hot = false;
-				
-				
+
+
 				if(value<0){
 					colorVal = (int)((belowZero - list.indexOf(value))/belowZero*128);
 					colorVal = Math.min(colorVal, 128);
 					hot = false;
-				
-					
+
+
 				}else if(value>0){
 					colorVal = (int)((list.indexOf(value)-belowZero+2)/aboveZero*128);
 					colorVal = Math.min(colorVal, 128);
 					hot = true;
 				}
-				
+
 				if(!hot){
 					g.setColor(new Color(128-colorVal, 0, colorVal+127));
 				}
 				else if(hot){
 					g.setColor(new Color(colorVal+127, 0, 128-colorVal));
 				}
-				
-				
+
+
 				g.fillRect(x, y, 7, 7);
 			}
-			}
-		
+		}
+
 		updateVoltageScaleText(list);
-		
+
 	}
-	
-	
+
+
 
 	private int getZeroAmount(ArrayList<Double> list) {
 		int counter = 0;
@@ -452,11 +471,11 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 				}
 			}
 		}
-		
+
 		return retval;
 	}
 
-	
+
 	private void drawVoltageScale(Graphics g){
 		int x = voltageBarX;
 		int y = voltageBarY;
@@ -464,22 +483,22 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		int height = 1;
 		double length = voltageBarLength/2;
 		//For hot:
-	for(double i = length; i >=0; i--){
-		int colorVal = (int) (i/length*128);
-		g.setColor(new Color(colorVal+127, 0, 128-colorVal));
-		colorVal = Math.min(colorVal, 128);
-		g.fillRect(x, (int) (y+length-i), width, height);
+		for(double i = length; i >=0; i--){
+			int colorVal = (int) (i/length*128);
+			g.setColor(new Color(colorVal+127, 0, 128-colorVal));
+			colorVal = Math.min(colorVal, 128);
+			g.fillRect(x, (int) (y+length-i), width, height);
+		}
+		for(double i = 1; i <=length; i++){
+			int colorVal = (int) (i/length*128);
+			g.setColor(new Color(128-colorVal, 0, colorVal+127));
+			colorVal = Math.min(colorVal, 128);
+			g.fillRect(x, (int) (y+length+i), width, height);
+		}
+
+
 	}
-	for(double i = 1; i <=length; i++){
-		int colorVal = (int) (i/length*128);
-		g.setColor(new Color(128-colorVal, 0, colorVal+127));
-		colorVal = Math.min(colorVal, 128);
-		g.fillRect(x, (int) (y+length+i), width, height);
-	}
-		
-		
-	}
-	
+
 
 	private void calculateVolateOnScreen() {
 		for(int x = DISPLAY_WIDTH/6 +5; x < DISPLAY_WIDTH*5/6-10; x+=pixel){
@@ -490,18 +509,18 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 					voltageValue[x][y] += calculateVoltage(ball, new Point(x, y));
 				}
 			}
-			}
-		
+		}
+
 	}
 
 	private double calculateVoltage(Ball ball, Point point) {
 		return ball.charge/distance(ball.x, ball.y, point.x, point.y)/(4*Math.PI*permitivity_of_free_space);
-		
+
 	}
 
 	private double distance(double x, double y, double x2, double y2) {
 		return Math.pow(Math.pow(x - x2, 2) + Math.pow(y - y2, 2), 0.5);
-		
+
 	}
 
 	private void calculateElectricFieldOnScreen() {
@@ -510,13 +529,13 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 				electricField[x][y] = new Force();
 				for(int i = 0; i <ballarray.length; i++){
 					Ball ball = ballarray[i];
-					
+
 					electricField[x][y].add(
 							calculateElectricField(ball,  new Point (x, y)));
 				}
 			}
 		}
-		
+
 	}
 
 	private Force calculateElectricField(Ball ball, Point point) {
@@ -529,15 +548,15 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	}
 
 	private void updateJLabel(JLabel jLabel, int i) {
-	
+
 		String str = "";
 		str+=(int)(ballarray[i].charge*1000000);
-		str+="µC";
+		str+="ÂµC";
 		jLabel.setText(str);
 		jLabel.setBounds((int)ballarray[i].x, (int)ballarray[i].y, 50, 25);
 		add(jLabel);
-	    jLabel.setVisible(true);
-		
+		jLabel.setVisible(true);
+
 	}
 
 	public Force CalculateForce(Ball ballA, Ball ballB) {
@@ -546,14 +565,14 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		boolean attract = attract(ballA, ballB);
 		magnitude *= k;
 		double distSquare = distanceSquared(ballA, ballB);
-		
+
 		/*
 		if(distSquare<1&&distSquare!=0){
 			System.out.println("FFFFFFFFFFFFFFFFFFFF " + distSquare);
 			distSquare=1;//This is in order to avoid massive accelerations.
 		}
-		*/
-		
+		 */
+
 		magnitude /= distSquare;
 
 		double theta = calculateTheta(ballA, ballB);
@@ -588,7 +607,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		}
 		return theta;
 	}
-	
+
 	private double calculateTheta2(Ball b1, Ball b2){
 		return Math.atan2(b1.x-b2.x, b1.y-b2.y);
 	}
@@ -613,10 +632,14 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 
 		public void actionPerformed(ActionEvent arg0) {
 			if(this.getText().equals("Start")) {
-				togglePaintLoop();
+				ballsMoving = true;
+				voltageCalcing = true;
+				
 				this.setText("Pause");
 			} else {
-				togglePaintLoop();
+				ballsMoving = false;
+				voltageCalcing = false;
+				
 				this.setText("Start");
 			}
 		}
@@ -625,31 +648,31 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent a) {
-	
-		
+
+
 		/*
 		 * 
 		 * temp commented out
 		 * 		 
-		
-		
+
+
 		int x = a.getX() +5;
 		x-=x%pixel;
 		int y = a.getY() +5;
 		y-=y%pixel;
 		//System.out.println (x + "," +y);
-		
+
 		//if(voltageValue[x-(x%7)+a][y-(y%7)+a]!=0){
-			
+
 			System.out.println(voltageValue[x+5][y] + "," + (x-2) + "," + (y));
-			
-			
-			
+
+
+
 			ArrayList<Double> list = makeList(voltageValue);
 			Collections.sort(list);
 			double belowZero = getNegativeAmount(list);
@@ -658,20 +681,20 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 			double value = voltageValue[x+5][y];
 			int colorVal = 128;
 			boolean hot = false;
-			
-			
+
+
 			if(value<0){
 				colorVal = (int)((belowZero - list.indexOf(value))/belowZero*128);
 				colorVal = Math.min(colorVal, 128);
 				hot = false;
-			
-				
+
+
 			}else if(value>0){
 				colorVal = (int)((list.indexOf(value)-belowZero+2)/aboveZero*128);
 				colorVal = Math.min(colorVal, 128);
 				hot = true;
 			}
-			
+
 			if(!hot){
 				System.out.println(new Color(128-colorVal, 0, colorVal+127));
 				System.out.println("Us: " + list.indexOf(value) + " Zero: "+ belowZero);
@@ -679,15 +702,15 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 			else if(hot){
 				System.out.println(new Color(colorVal+127, 0, 128-colorVal));
 			}
-			
-		
+
+
 		 */
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent a) {
-		System.out.println("X: " + a.getX() + " Y: " + a.getY());
-		
+		//System.out.println("X: " + a.getX() + " Y: " + a.getY());
+
 		try {
 			Robot robot = new Robot();
 			System.out.println(robot.getPixelColor(a.getX(), a.getY()));
@@ -695,31 +718,31 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
+
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mousePressed(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
