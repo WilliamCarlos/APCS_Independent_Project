@@ -23,4 +23,8 @@ public class Main {
 	f.setResizable(false);
 	
 	} 
+	
+	public Display getDisplay(){
+		return display.getSelf();
+	}
 }
