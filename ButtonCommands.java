@@ -1,15 +1,23 @@
-public abstract class ButtonCommands extends Main{
-
-	Display d = getDisplay(); //This takes the display from Main class. AKA the same display thats running.
+public abstract class ButtonCommands{
+	Display d;
+	ButtonCommands(Display d){
+		this.d = d;
+	}
+	
 	abstract void execute(int caseNum);
 }
 
 class pauseBallMovement extends ButtonCommands{
 
+	pauseBallMovement(Display d) {
+		super(d);
+		
+	}
+
 	@Override
 	void execute(int caseNum) {
 
-		switch(caseNum){
+		switch(caseNum%2){
 		
 		case 0:
 			d.ballsMoving = true;
