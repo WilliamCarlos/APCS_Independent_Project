@@ -61,10 +61,10 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	int pixel =7;
 
 	int timeCounter = -TIME_BETWEEN_REPLOTS;
-	boolean ballsMoving = true;
+	boolean ballsMoving = false;
 	boolean voltageCalcing = true;
-	boolean drawVoltage = voltageCalcing;
-	boolean drawBalls = ballsMoving;
+	boolean drawVoltage = true;
+	boolean drawBalls = true;
 
 
 
@@ -83,7 +83,8 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	public void init() {
 		setSize(DISPLAY_WIDTH, DISPLAY_HEIGHT);
 		paintloop = true;
-		start = new StartButton( new pauseBallMovement());
+		String[] startStrs = {"Pause", "Start"};
+		start = new StartButton( new pauseBallMovement(this), startStrs);
 		start.setBounds(DISPLAY_HEIGHT/9, DISPLAY_WIDTH/20, 100, 50);
 		add(start);
 		start.setVisible(true);
@@ -122,7 +123,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 
 				String str = "";
 				str+=(int)(ball.charge*1000000);
-				str+="ÂµC";
+				str+="µ";
 				temp.setText(str);
 				temp.setBounds((int)ball.x, (int)ball.y, 50, 25);
 				add(temp);
@@ -142,7 +143,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		JLabel temp = chargeDisplay[a];
 		String str = "";
 		str+=(int)(ball.charge*1000000);
-		str+="ÂµC";
+		str+="µ";
 		temp.setText(str);
 		temp.setBounds((int)ball.x, (int)ball.y, 50, 25);
 		add(temp);
@@ -551,7 +552,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 
 		String str = "";
 		str+=(int)(ballarray[i].charge*1000000);
-		str+="ÂµC";
+		str+="µ";
 		jLabel.setText(str);
 		jLabel.setBounds((int)ballarray[i].x, (int)ballarray[i].y, 50, 25);
 		add(jLabel);
@@ -627,28 +628,25 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	private class StartButton extends JButton implements ActionListener {
 		
 		public int timesClicked = 0;
+		public int roundLength; //How many times button must be clicked to return to original
+		//position.
 		ButtonCommands command;
-		StartButton(ButtonCommands command) {
+		String[] strs; //Contains the strings that will be displayed on the button
+		//with every click.
+		
+		StartButton(ButtonCommands command, String[]strs) {
 			super("Start");
 			addActionListener(this);
 			this.command = command;
-			//this.command.execute(1);
+			roundLength = strs.length;
+			this.strs = strs;
+			
 			
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
-			switch(timesClicked%2){
-			case 0:
-				this.setText("Pause");
-				command.execute(timesClicked%2);
-				break;
-			case 1:
-				this.setText("Start");
-				command.execute(timesClicked%2);
-				break;
-				
-			
-			}
+			this.setText(strs[timesClicked%roundLength]);
+			command.execute(timesClicked);
 			timesClicked++;	
 			
 		}
