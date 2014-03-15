@@ -1,4 +1,3 @@
-
 public abstract class ButtonCommands extends Main{
 
 	Display d = getDisplay(); //This takes the display from Main class. AKA the same display thats running.
