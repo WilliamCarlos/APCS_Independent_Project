@@ -1,4 +1,3 @@
-
 public class Force {
 	public double magnitude;
 	public double direction;
