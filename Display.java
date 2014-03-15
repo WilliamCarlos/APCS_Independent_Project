@@ -83,7 +83,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	public void init() {
 		setSize(DISPLAY_WIDTH, DISPLAY_HEIGHT);
 		paintloop = true;
-		String[] startStrs = {"Pause", "Start"};
+		String[] startStrs = {"Start", "Pause"};
 		start = new StartButton( new pauseBallMovement(this), startStrs);
 		start.setBounds(DISPLAY_HEIGHT/9, DISPLAY_WIDTH/20, 100, 50);
 		add(start);
@@ -635,7 +635,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		//with every click.
 		
 		StartButton(ButtonCommands command, String[]strs) {
-			super("Start");
+			super(strs[0]);
 			addActionListener(this);
 			this.command = command;
 			roundLength = strs.length;
@@ -645,7 +645,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
-			this.setText(strs[timesClicked%roundLength]);
+			this.setText(strs[(timesClicked+1)%roundLength]);
 			command.execute(timesClicked);
 			timesClicked++;	
 			
