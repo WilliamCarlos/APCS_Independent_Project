@@ -31,3 +31,20 @@ class pauseBallMovement extends ButtonCommands{
 	}
 	
 }
+
+class Reset extends ButtonCommands{
+
+	Reset(Display d) {
+		super(d);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	void execute(int caseNum) {
+		d.removeAll();
+		d.init();
+		
+		
+	}
+	
+}
