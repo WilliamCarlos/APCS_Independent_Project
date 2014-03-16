@@ -44,7 +44,12 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	double lastvolume;
 	double[] originalX = new double[100];
 	double[] originalY = new double[100];
-	private StartButton start;
+	
+	
+	private Button ballStart;
+	private Button reset;
+	
+	
 	JLabel[] chargeDisplay;
 	Force[][] electricField;
 	double[][] voltageValue;
@@ -61,10 +66,10 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	int pixel =7;
 
 	int timeCounter = -TIME_BETWEEN_REPLOTS;
-	boolean ballsMoving = false;
-	boolean voltageCalcing = true;
-	boolean drawVoltage = true;
-	boolean drawBalls = true;
+	boolean ballsMoving;
+	boolean voltageCalcing;
+	boolean drawVoltage;
+	boolean drawBalls;
 
 
 
@@ -81,13 +86,33 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	}
 
 	public void init() {
+		
+		//For Buttons:
+		ballsMoving = false;
+		voltageCalcing = true;
+		drawVoltage = true;
+		drawBalls = true;
+		
+		
+		
+		
+		
 		setSize(DISPLAY_WIDTH, DISPLAY_HEIGHT);
 		paintloop = true;
-		String[] startStrs = {"Start", "Pause"};
-		start = new StartButton( new pauseBallMovement(this), startStrs);
-		start.setBounds(DISPLAY_HEIGHT/9, DISPLAY_WIDTH/20, 100, 50);
-		add(start);
-		start.setVisible(true);
+		
+		
+		String[] startStrs = {"Start", "Pause"};		
+		ballStart = new Button( new pauseBallMovement(this), startStrs);
+		ballStart.setBounds(DISPLAY_HEIGHT/9, DISPLAY_WIDTH/20, 100, 50);
+		add(ballStart);
+		ballStart.setVisible(true);
+		
+		String[] resetStrs = {"Reset"};
+		reset = new Button (new Reset(this), resetStrs);
+		reset.setBounds(DISPLAY_HEIGHT/9 +150, DISPLAY_WIDTH/20, 100, 50);
+		add(reset);
+		reset.setVisible(true);
+		
 		ballarray = new Ball[7];
 		chargeDisplay = new JLabel[ballarray.length];
 		addMouseListener(this);
@@ -118,7 +143,9 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 				ballarray[i*3+j] = ball;
 				originalX[i*3+j] = ballarray[i*3+j].x;
 				originalY[i*3+j] = ballarray[i*3+j].y;
+				
 				chargeDisplay[i*3+j] = new JLabel();
+				
 				JLabel temp = chargeDisplay[i*3+j];
 
 				String str = "";
@@ -164,7 +191,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		volume = DISPLAY_WIDTH*DISPLAY_HEIGHT;
 		g.setColor(Color.BLUE);
 
-		start.repaint();
+		//ballStart.repaint();
 
 
 		
@@ -555,8 +582,8 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		str+="µ";
 		jLabel.setText(str);
 		jLabel.setBounds((int)ballarray[i].x, (int)ballarray[i].y, 50, 25);
-		add(jLabel);
-		jLabel.setVisible(true);
+		//add(jLabel);
+		//jLabel.setVisible(true);
 
 	}
 
@@ -625,7 +652,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		paintloop = value;
 	}
 
-	private class StartButton extends JButton implements ActionListener {
+	private class Button extends JButton implements ActionListener {
 		
 		public int timesClicked = 0;
 		public int roundLength; //How many times button must be clicked to return to original
@@ -634,7 +661,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		String[] strs; //Contains the strings that will be displayed on the button
 		//with every click.
 		
-		StartButton(ButtonCommands command, String[]strs) {
+		Button(ButtonCommands command, String[]strs) {
 			super(strs[0]);
 			addActionListener(this);
 			this.command = command;
