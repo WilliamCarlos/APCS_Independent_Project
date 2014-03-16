@@ -103,13 +103,13 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		
 		String[] startStrs = {"Start", "Pause"};		
 		ballStart = new Button( new pauseBallMovement(this), startStrs);
-		ballStart.setBounds(DISPLAY_HEIGHT/9, DISPLAY_WIDTH/20, 100, 50);
+		ballStart.setBounds(DISPLAY_HEIGHT/9 +75, DISPLAY_WIDTH/20, 100, 50);
 		add(ballStart);
 		ballStart.setVisible(true);
 		
 		String[] resetStrs = {"Reset"};
 		reset = new Button (new Reset(this), resetStrs);
-		reset.setBounds(DISPLAY_HEIGHT/9 +150, DISPLAY_WIDTH/20, 100, 50);
+		reset.setBounds(DISPLAY_HEIGHT/9 +225, DISPLAY_WIDTH/20, 100, 50);
 		add(reset);
 		reset.setVisible(true);
 		
