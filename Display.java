@@ -48,6 +48,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	
 	private Button ballStart;
 	private Button reset;
+	private Button Voltage;
 	
 	
 	JLabel[] chargeDisplay;
@@ -89,8 +90,8 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		
 		//For Buttons:
 		ballsMoving = false;
-		voltageCalcing = true;
-		drawVoltage = true;
+		voltageCalcing = false;
+		drawVoltage = false;
 		drawBalls = true;
 		
 		
@@ -112,6 +113,12 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		reset.setBounds(DISPLAY_HEIGHT/9 +225, DISPLAY_WIDTH/20, 100, 50);
 		add(reset);
 		reset.setVisible(true);
+		
+		String[] voltageOnOff = {"On", "Off"};
+		Voltage = new Button (new VoltageOnOff(this), voltageOnOff);
+		Voltage.setBounds(DISPLAY_HEIGHT/9 +425, DISPLAY_WIDTH/20, 100, 50);
+		add(Voltage);
+		Voltage.setVisible(true);
 		
 		ballarray = new Ball[7];
 		chargeDisplay = new JLabel[ballarray.length];
