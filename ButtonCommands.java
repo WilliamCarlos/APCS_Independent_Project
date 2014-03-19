@@ -48,3 +48,28 @@ class Reset extends ButtonCommands{
 	}
 	
 }
+
+
+class VoltageOnOff extends ButtonCommands{
+
+	VoltageOnOff(Display d) {
+		super(d);
+		// TODO Auto-generated constructor stub
+	}
+	
+	void execute(int caseNum) {
+
+		switch(caseNum%2){
+		
+		case 0:
+			d.drawVoltage = true;
+			d.voltageCalcing = true;
+			break;
+		case 1:
+			d.drawVoltage = false;
+			d.voltageCalcing = false;
+			break;
+		}
+	}
+	
+}
