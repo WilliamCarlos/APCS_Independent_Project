@@ -34,16 +34,16 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	public int DISPLAY_WIDTH;   
 	public int DISPLAY_HEIGHT;
 	private boolean paintloop = true;
-	int TIME_BETWEEN_REPLOTS = 50;
+	public int TIME_BETWEEN_REPLOTS = 50;
 
-	Ball[] ballarray;
+	ArrayList<Ball> ballarray;
 	int xdif = 0;
 	int ydif = 0;
 	JFrame f;
 	double volume;
 	double lastvolume;
-	double[] originalX = new double[100];
-	double[] originalY = new double[100];
+	ArrayList<Double> originalX = new ArrayList<Double>();
+	ArrayList<Double> originalY = new ArrayList<Double>();
 	
 	
 	private Button ballStart;
@@ -51,7 +51,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	private Button Voltage;
 	
 	
-	JLabel[] chargeDisplay;
+	ArrayList<JLabel> chargeDisplay;
 	Force[][] electricField;
 	double[][] voltageValue;
 
@@ -88,11 +88,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 
 	public void init() {
 		
-		//For Buttons:
-		ballsMoving = false;
-		voltageCalcing = false;
-		drawVoltage = false;
-		drawBalls = true;
+		
 		
 		
 		
@@ -120,8 +116,8 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		add(Voltage);
 		Voltage.setVisible(true);
 		
-		ballarray = new Ball[7];
-		chargeDisplay = new JLabel[ballarray.length];
+		ballarray = new ArrayList<Ball>();
+		chargeDisplay = new ArrayList<JLabel>();
 		addMouseListener(this);
 		addMouseMotionListener(this);
 
@@ -129,7 +125,6 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		voltageBarMax = new JLabel("MAX");
 		voltageBarMax.setBounds(voltageBarX + 55, voltageBarY-25, 50, 75);
 		add(voltageBarMax);
-		voltageBarMax.setVisible(true);
 
 		/*
 		voltageBarMid = new JLabel("MID");
@@ -140,27 +135,25 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		voltageBarMin = new JLabel("MIN");
 		voltageBarMin.setBounds(voltageBarX + 55, voltageBarY + voltageBarLength-50, 50, 75);
 		add(voltageBarMin);
-		voltageBarMin.setVisible(true);
+		
 
-		Ball ball;
 		for (int i = 0; i<2; i++) {
 			for (int j = 0; j<3; j++) {
 
-				ball = new Ball(15, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 0, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000));
-				ballarray[i*3+j] = ball;
-				originalX[i*3+j] = ballarray[i*3+j].x;
-				originalY[i*3+j] = ballarray[i*3+j].y;
+				ballarray.add(new Ball(15, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 0, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000)));
+				originalX.add(ballarray.get(ballarray.size()-1).x);
+				originalY.add(ballarray.get(ballarray.size()-1).y);
 				
-				chargeDisplay[i*3+j] = new JLabel();
+				JLabel temp = new JLabel();
 				
-				JLabel temp = chargeDisplay[i*3+j];
 
 				String str = "";
-				str+=(int)(ball.charge*1000000);
+				str+=(int)(ballarray.get(ballarray.size()-1).charge*1000000);
 				str+="µ";
 				temp.setText(str);
-				temp.setBounds((int)ball.x, (int)ball.y, 50, 25);
-				add(temp);
+				temp.setBounds((int)ballarray.get(ballarray.size()-1).x, (int)ballarray.get(ballarray.size()-1).y, 50, 25);
+				chargeDisplay.add(temp);
+				add(chargeDisplay.get(chargeDisplay.size()-1));
 				temp.setVisible(true);
 
 
@@ -168,21 +161,29 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 
 		}
 
-		ball = new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 0, 0, 0, -Math.max(Math.random()*100/1000000, 35/1000000));
-		int a = 6;
-		ballarray[a] = ball;
-		originalX[a] = ballarray[a].x;
-		originalY[a] = ballarray[a].y;
-		chargeDisplay[a] = new JLabel();
-		JLabel temp = chargeDisplay[a];
+		ballarray.add(new Ball(10, DISPLAY_WIDTH/2-135+0*30, DISPLAY_HEIGHT/6+65+5*30, 0, 0, 0, -Math.max(Math.random()*100/1000000, 35/1000000)));
+
+		originalX.add(ballarray.get(ballarray.size()-1).x);
+		originalY.add(ballarray.get(ballarray.size()-1).y);
+
+		JLabel temp = new JLabel();
 		String str = "";
-		str+=(int)(ball.charge*1000000);
+		str+=(int)(ballarray.get(ballarray.size()-1).charge*1000000);
 		str+="µ";
 		temp.setText(str);
-		temp.setBounds((int)ball.x, (int)ball.y, 50, 25);
-		add(temp);
+		temp.setBounds((int)ballarray.get(ballarray.size()-1).x, (int)ballarray.get(ballarray.size()-1).y, 50, 25);
+		chargeDisplay.add(temp);
+		add(chargeDisplay.get(chargeDisplay.size()-1));
 		temp.setVisible(true);
 
+		
+		//For Buttons:
+				ballsMoving = false;
+				voltageCalcing = false;
+				drawVoltage = false;
+				drawBalls = true;
+				voltageBarMax.setVisible(false);
+				voltageBarMin.setVisible(false);
 
 		repaint();
 
@@ -224,9 +225,9 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 				drawVoltageScale(g);
 			}
 			if(drawBalls){
-				for(int i = 0; i<ballarray.length; i++) {
-					ballarray[i].draw(g);
-					updateJLabel(chargeDisplay[i], i);
+				for(int i = 0; i<ballarray.size(); i++) {
+					ballarray.get(i).draw(g);
+					updateJLabel(chargeDisplay.get(i), i);
 				}
 				
 			}
@@ -244,32 +245,32 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 
 	public void ballMovement(Graphics g) {
 
-		for(int k = 0; k <ballarray.length; k++){
+		for(int k = 0; k <ballarray.size(); k++){
 
 
-			Ball temp = ballarray[k];
+			Ball temp = ballarray.get(k);
 			temp.force = new Force();
 
 
 
-			for(int j = 0; j <ballarray.length; j++){
+			for(int j = 0; j <ballarray.size(); j++){
 				if(k!=j){
-					Ball temp2 = ballarray[j];
+					Ball temp2 = ballarray.get(j);
 
-					temp.force.add(CalculateForce(ballarray[j], ballarray[k]));
+					temp.force.add(CalculateForce(ballarray.get(j), ballarray.get(k)));
 					//System.out.println("Calced: " + j + " on: " + k);
 				}
 			}
 		}
 
-		for (int i = 0; i<ballarray.length; i++) {
-			ballarray[i].update(g, DISPLAY_WIDTH, DISPLAY_HEIGHT, TIME_BETWEEN_REPLOTS);
-			if (ballarray[i].hitWall == true) {
+		for (int i = 0; i<ballarray.size(); i++) {
+			ballarray.get(i).update(g, DISPLAY_WIDTH, DISPLAY_HEIGHT, TIME_BETWEEN_REPLOTS);
+			if (ballarray.get(i).hitWall == true) {
 				if (xdif<0) {
-					ballarray[i].x+=xdif;
+					ballarray.get(i).x+=xdif;
 				}
 				if (ydif<0) {
-					ballarray[i].y+=ydif;
+					ballarray.get(i).y+=ydif;
 				}
 			}
 			
@@ -277,8 +278,8 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 
 		}
 		if (xdif!= 0 || ydif!=0) {
-			for (int i = 0; i<ballarray.length; i++) {
-				ballarray[i].speed*=Math.sqrt(lastvolume/volume);
+			for (int i = 0; i<ballarray.size(); i++) {
+				ballarray.get(i).speed*=Math.sqrt(lastvolume/volume);
 			}
 		}
 
@@ -310,16 +311,16 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 			totE+=Math.pow(b.getSpeed() , 2)*b.mass*0.5;
 		}
 
-		for(int k = 0; k <ballarray.length; k++){
+		for(int k = 0; k <ballarray.size(); k++){
 
 
-			Ball temp = ballarray[k];
+			Ball temp = ballarray.get(k);
 
-			for(int j = 0; j <ballarray.length; j++){
+			for(int j = 0; j <ballarray.size(); j++){
 				if(k!=j){
-					Ball temp2 = ballarray[j];
+					Ball temp2 = ballarray.get(j);
 
-					totE+=(CalculatePotentialEnergy(ballarray[j], ballarray[k]));
+					totE+=(CalculatePotentialEnergy(ballarray.get(j), ballarray.get(k)));
 
 				}}}
 		//System.out.println(totE);
@@ -539,8 +540,8 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		for(int x = DISPLAY_WIDTH/6 +5; x < DISPLAY_WIDTH*5/6-10; x+=pixel){
 			for (int y = DISPLAY_HEIGHT/6 +5; y <DISPLAY_HEIGHT*5/6 + DISPLAY_HEIGHT/10-30; y+=pixel){
 				voltageValue[x][y] = 0;
-				for(int i = 0; i <ballarray.length; i++){
-					Ball ball = ballarray[i];
+				for(int i = 0; i <ballarray.size(); i++){
+					Ball ball = ballarray.get(i);
 					voltageValue[x][y] += calculateVoltage(ball, new Point(x, y));
 				}
 			}
@@ -562,8 +563,8 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		for(int x = DISPLAY_WIDTH/6+5; x < DISPLAY_WIDTH*5/6-10; x+=pixel){
 			for (int y = DISPLAY_HEIGHT/6+5; y <DISPLAY_HEIGHT*5/6 + DISPLAY_HEIGHT/10-30; y+=pixel){
 				electricField[x][y] = new Force();
-				for(int i = 0; i <ballarray.length; i++){
-					Ball ball = ballarray[i];
+				for(int i = 0; i <ballarray.size(); i++){
+					Ball ball = ballarray.get(i);
 
 					electricField[x][y].add(
 							calculateElectricField(ball,  new Point (x, y)));
@@ -585,10 +586,10 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	private void updateJLabel(JLabel jLabel, int i) {
 
 		String str = "";
-		str+=(int)(ballarray[i].charge*1000000);
+		str+=(int)(ballarray.get(i).charge*1000000);
 		str+="µ";
 		jLabel.setText(str);
-		jLabel.setBounds((int)ballarray[i].x, (int)ballarray[i].y, 50, 25);
+		jLabel.setBounds((int)ballarray.get(i).x, (int)ballarray.get(i).y, 50, 25);
 		//add(jLabel);
 		//jLabel.setVisible(true);
 
