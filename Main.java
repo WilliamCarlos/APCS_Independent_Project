@@ -17,7 +17,7 @@ public class Main {
 	
 	f.setLayout(null); 
 	f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-	f.setTitle("2D Ball Collisions"); 
+	f.setTitle("Ball Physics Collisions"); 
 	f.add(display); 
 	f.setVisible(true);
 	f.setResizable(false);
