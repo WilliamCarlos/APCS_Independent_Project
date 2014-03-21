@@ -18,14 +18,18 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.Line2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.text.Document;
+import javax.swing.text.PlainDocument;
 
 
 public class Display extends JComponent implements MouseListener, MouseMotionListener {
@@ -35,6 +39,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	public int DISPLAY_HEIGHT;
 	private boolean paintloop = true;
 	public int TIME_BETWEEN_REPLOTS = 50;
+	private ballTextField balltextfield;
 
 	ArrayList<Ball> ballarray;
 	int xdif = 0;
@@ -44,13 +49,13 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	double lastvolume;
 	ArrayList<Double> originalX = new ArrayList<Double>();
 	ArrayList<Double> originalY = new ArrayList<Double>();
-	
-	
+
+
 	private Button ballStart;
 	private Button reset;
 	private Button Voltage;
-	
-	
+
+
 	ArrayList<JLabel> chargeDisplay;
 	Force[][] electricField;
 	double[][] voltageValue;
@@ -88,34 +93,30 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 
 	public void init() {
 		
-		
-		
-		
-		
-		
+		balltextfield = new ballTextField();
 		
 		setSize(DISPLAY_WIDTH, DISPLAY_HEIGHT);
 		paintloop = true;
-		
-		
+
+
 		String[] startStrs = {"Start", "Pause"};		
 		ballStart = new Button( new pauseBallMovement(this), startStrs);
 		ballStart.setBounds(DISPLAY_HEIGHT/9 +75, DISPLAY_WIDTH/20, 100, 50);
 		add(ballStart);
 		ballStart.setVisible(true);
-		
+
 		String[] resetStrs = {"Reset"};
 		reset = new Button (new Reset(this), resetStrs);
 		reset.setBounds(DISPLAY_HEIGHT/9 +225, DISPLAY_WIDTH/20, 100, 50);
 		add(reset);
 		reset.setVisible(true);
-		
+
 		String[] voltageOnOff = {"On", "Off"};
 		Voltage = new Button (new VoltageOnOff(this), voltageOnOff);
 		Voltage.setBounds(DISPLAY_HEIGHT/9 +425, DISPLAY_WIDTH/20, 100, 50);
 		add(Voltage);
 		Voltage.setVisible(true);
-		
+
 		ballarray = new ArrayList<Ball>();
 		chargeDisplay = new ArrayList<JLabel>();
 		addMouseListener(this);
@@ -135,7 +136,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		voltageBarMin = new JLabel("MIN");
 		voltageBarMin.setBounds(voltageBarX + 55, voltageBarY + voltageBarLength-50, 50, 75);
 		add(voltageBarMin);
-		
+
 
 		for (int i = 0; i<2; i++) {
 			for (int j = 0; j<3; j++) {
@@ -143,9 +144,9 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 				ballarray.add(new Ball(15, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 0, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000)));
 				originalX.add(ballarray.get(ballarray.size()-1).x);
 				originalY.add(ballarray.get(ballarray.size()-1).y);
-				
+
 				JLabel temp = new JLabel();
-				
+
 
 				String str = "";
 				str+=(int)(ballarray.get(ballarray.size()-1).charge*1000000);
@@ -176,14 +177,14 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		add(chargeDisplay.get(chargeDisplay.size()-1));
 		temp.setVisible(true);
 
-		
+
 		//For Buttons:
-				ballsMoving = false;
-				voltageCalcing = false;
-				drawVoltage = false;
-				drawBalls = true;
-				voltageBarMax.setVisible(false);
-				voltageBarMin.setVisible(false);
+		ballsMoving = false;
+		voltageCalcing = false;
+		drawVoltage = false;
+		drawBalls = true;
+		voltageBarMax.setVisible(false);
+		voltageBarMin.setVisible(false);
 
 		repaint();
 
@@ -202,7 +203,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		//ballStart.repaint();
 
 
-		
+
 
 
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,  RenderingHints.VALUE_ANTIALIAS_ON);
@@ -229,12 +230,12 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 					ballarray.get(i).draw(g);
 					updateJLabel(chargeDisplay.get(i), i);
 				}
-				
+
 			}
 			repaint();
 		}
 
-		
+
 
 		repaint();
 	}
@@ -273,8 +274,8 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 					ballarray.get(i).y+=ydif;
 				}
 			}
-			
-			
+
+
 
 		}
 		if (xdif!= 0 || ydif!=0) {
@@ -284,10 +285,10 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		}
 
 
-		
+
 
 	}
-	
+
 	public void calcVoltage(){
 		if(timeCounter%50==0){
 			//calculateElectricFieldOnScreen();
@@ -661,29 +662,29 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	}
 
 	private class Button extends JButton implements ActionListener {
-		
+
 		public int timesClicked = 0;
 		public int roundLength; //How many times button must be clicked to return to original
 		//position.
 		ButtonCommands command;
 		String[] strs; //Contains the strings that will be displayed on the button
 		//with every click.
-		
+
 		Button(ButtonCommands command, String[]strs) {
 			super(strs[0]);
 			addActionListener(this);
 			this.command = command;
 			roundLength = strs.length;
 			this.strs = strs;
-			
-			
+
+
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
 			this.setText(strs[(timesClicked+1)%roundLength]);
 			command.execute(timesClicked);
 			timesClicked++;	
-			
+
 		}
 	}
 
@@ -761,6 +762,13 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 			e.printStackTrace();
 		}
 
+		if (a.getX() /*+radius*/ <= DISPLAY_WIDTH*5/6 && a.getX() /*-radius*/ >= DISPLAY_WIDTH/6 + 3 && a.getY()/*+radius*/ <= DISPLAY_HEIGHT*9/10 && a.getY()/*-radius*/ >= DISPLAY_HEIGHT/6 + 3) {
+			System.out.println("in box");
+
+			balltextfield.setBounds(a.getX(), a.getY(), 100, 50);
+			add(balltextfield);
+			balltextfield.setVisible(true);
+		}
 
 	}
 
@@ -787,8 +795,36 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	public Display getSelf(){
 		return this;
 	}
+
+	private class ballTextField extends JFormattedTextField implements PropertyChangeListener {
+		 private JLabel Size;
+		 private JLabel Force;
+		 
+		 private String size = "Size: ";
+		 private String force = "Force: ";
+		 
+		ballTextField() {
+			setColumns(10);
+		}
+		
+		protected Document createDefaultModel() {
+	         return new ballDocument();
+	    }
+		
+		class ballDocument extends PlainDocument {
+			
+		}
+
+		@Override
+		public void propertyChange(PropertyChangeEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
 }
+
+
