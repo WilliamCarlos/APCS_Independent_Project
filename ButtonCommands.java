@@ -64,10 +64,14 @@ class VoltageOnOff extends ButtonCommands{
 		case 0:
 			d.drawVoltage = true;
 			d.voltageCalcing = true;
+			d.voltageBarMax.setVisible(true);
+			d.voltageBarMin.setVisible(true);
 			break;
 		case 1:
 			d.drawVoltage = false;
 			d.voltageCalcing = false;
+			d.voltageBarMax.setVisible(false);
+			d.voltageBarMin.setVisible(false);
 			break;
 		}
 	}
