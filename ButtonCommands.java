@@ -21,11 +21,11 @@ class pauseBallMovement extends ButtonCommands{
 		
 		case 0:
 			d.ballsMoving = true;
-			d.voltageCalcing = true;
+			
 			break;
 		case 1:
 			d.ballsMoving = false;
-			d.voltageCalcing = false;
+			
 			break;
 		}
 	}
