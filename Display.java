@@ -138,8 +138,8 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		add(voltageBarMin);
 
 
-		for (int i = 0; i<2; i++) {
-			for (int j = 0; j<3; j++) {
+		for (int i = 0; i<1; i++) {
+			for (int j = 0; j<1; j++) {
 
 				ballarray.add(new Ball(15, DISPLAY_WIDTH/2-135+i*30, DISPLAY_HEIGHT/6+65+j*30, 0, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000)));
 				originalX.add(ballarray.get(ballarray.size()-1).x);
@@ -150,7 +150,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 
 				String str = "";
 				str+=(int)(ballarray.get(ballarray.size()-1).charge*1000000);
-				str+="µ";
+				str+="Âµ";
 				temp.setText(str);
 				temp.setBounds((int)ballarray.get(ballarray.size()-1).x, (int)ballarray.get(ballarray.size()-1).y, 50, 25);
 				chargeDisplay.add(temp);
@@ -170,7 +170,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		JLabel temp = new JLabel();
 		String str = "";
 		str+=(int)(ballarray.get(ballarray.size()-1).charge*1000000);
-		str+="µ";
+		str+="Âµ";
 		temp.setText(str);
 		temp.setBounds((int)ballarray.get(ballarray.size()-1).x, (int)ballarray.get(ballarray.size()-1).y, 50, 25);
 		chargeDisplay.add(temp);
@@ -588,7 +588,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 
 		String str = "";
 		str+=(int)(ballarray.get(i).charge*1000000);
-		str+="µ";
+		str+="Âµ";
 		jLabel.setText(str);
 		jLabel.setBounds((int)ballarray.get(i).x, (int)ballarray.get(i).y, 50, 25);
 		//add(jLabel);
@@ -765,9 +765,23 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 		if (a.getX() /*+radius*/ <= DISPLAY_WIDTH*5/6 && a.getX() /*-radius*/ >= DISPLAY_WIDTH/6 + 3 && a.getY()/*+radius*/ <= DISPLAY_HEIGHT*9/10 && a.getY()/*-radius*/ >= DISPLAY_HEIGHT/6 + 3) {
 			System.out.println("in box");
 
-			balltextfield.setBounds(a.getX(), a.getY(), 100, 50);
-			add(balltextfield);
-			balltextfield.setVisible(true);
+			Ball add = new Ball(15, a.getX(), a.getY(), 0, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000));
+			ballarray.add(add);
+			originalX.add(ballarray.get(ballarray.size()-1).x);
+			originalY.add(ballarray.get(ballarray.size()-1).y);
+
+			JLabel temp = new JLabel();
+
+
+			String str = "";
+			str+=(int)(ballarray.get(ballarray.size()-1).charge*1000000);
+			str+="Âµ";
+			temp.setText(str);
+			temp.setBounds((int)ballarray.get(ballarray.size()-1).x, (int)ballarray.get(ballarray.size()-1).y, 50, 25);
+			chargeDisplay.add(temp);
+			add(chargeDisplay.get(chargeDisplay.size()-1));
+			temp.setVisible(true);
+			repaint();
 		}
 
 	}
