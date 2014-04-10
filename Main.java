@@ -2,6 +2,8 @@
  * @author Dean Leitersdorf, William Lee, Ophir Sneh
 */
 
+import java.awt.Color;
+
 import javax.swing.JFrame;
 public class Main { 
 	static JFrame f = new JFrame(); 
@@ -18,6 +20,7 @@ public class Main {
 	f.setLayout(null); 
 	f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
 	f.setTitle("Ball Physics Collisions"); 
+	f.getContentPane().setBackground(new Color(96,96,96));
 	f.add(display); 
 	f.setVisible(true);
 	f.setResizable(false);

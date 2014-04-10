@@ -77,3 +77,27 @@ class VoltageOnOff extends ButtonCommands{
 	}
 	
 }
+
+class toogleElasticWalls extends ButtonCommands{
+
+
+	toogleElasticWalls(Display d) {
+		super(d);
+		
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	void execute(int caseNum) {
+		switch(caseNum%2){
+		case 0:
+			d.elasticWalls = false;
+			break;
+		case 1:
+			d.elasticWalls = true;
+			break;
+		}
+		
+	}
+	
+}

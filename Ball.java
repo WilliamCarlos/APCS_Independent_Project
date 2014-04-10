@@ -6,11 +6,14 @@ import java.awt.geom.Line2D;
 public class Ball {
 	public double x, y, mySize, mass, dx, dy, speed, charge, acceleration, accelerationD;
 	public boolean hitWall;
+	public Display d;
+	
 	public Force force = new Force();
 	Line2D.Double forceVector;
 
 
-	public Ball (double size, double X, double Y, double dirx, double diry, double sped, double charge) {
+	public Ball (Display d, double size, double X, double Y, double dirx, double diry, double sped, double charge) {
+		this.d = d;
 		mySize = size;
 		x = X;
 		y = Y;
@@ -68,22 +71,25 @@ public class Ball {
 		/*
 		 * checks collisions with walls
 		 */
+		
 		if (x+radius >= width*5/6) {
-			dx*=-1;
+			if(d.elasticWalls)dx*=-1;else if(dx>0)dx = 0;//If walls are inelastic, and ball is trying
+														 //to move right.
 			hitWall = true;
 		}
 		if (x-radius <= width/6 + 3) {
-			dx*=-1;
+			if(d.elasticWalls)dx*=-1;else if(dx<0)dx=0;//If ball is trying to move left.
 			hitWall = true;
 		}
 		if (y+radius >= height*9/10) {
-				dy*=-1;
+			if(d.elasticWalls)dy*=-1;else if(dy>0)dy=0;//If ball is trying to move down.
 			hitWall = true;
 		}
 		if (y-radius <= height/6 + 3) {
-			dy*=-1;
+			if(d.elasticWalls)dy*=-1;else if(dy<0)dy=0;//If ball is trying to move up.
 			hitWall = true;
 		}
+	
 		/*
 		 * makes sure balls wont escape if they glitch out
 		 */
