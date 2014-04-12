@@ -71,6 +71,7 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 	private Button reset;
 	private Button elasticWallsButton;
 	private Button Voltage;
+	private Button addOrEdit;
 
 
 
@@ -95,6 +96,7 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 	boolean drawVoltage;
 	boolean drawBalls;
 	boolean elasticWalls;
+	boolean addOrEditBoolean;//Add - true, Edit - false.
 
 	public initialDisplay(int w, int h, JFrame f, Program program) {
 		super(w, h, f, program);
@@ -138,6 +140,12 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 		String[] voltageOnOff = {"Voltage: Off", "Voltage: On"};
 		Voltage = new Button (new VoltageOnOff(this), voltageOnOff);
 		Voltage.setBounds(height/9 +425, width/20, 100, 50);
+		add(Voltage);
+		Voltage.setVisible(true);
+		
+		String[] addOrEditStrings = {"OnClick: Add", "OnClick: Edit"};
+		Voltage = new Button (new addOrEditCommand(this), addOrEditStrings);
+		Voltage.setBounds(height/9 +525, width/20, 100, 50);
 		add(Voltage);
 		Voltage.setVisible(true);
 
@@ -213,6 +221,7 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 		voltageBarMax.setVisible(false);
 		voltageBarMin.setVisible(false);
 		elasticWalls = true;
+		addOrEditBoolean = true;
 
 		repaint();
 
@@ -857,6 +866,7 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 						&&a.getY()>=b.y-b.getRadius()&&a.getY()<=b.y+b.getRadius()
 						)spaceFree=false;
 			}
+			if(addOrEditBoolean){
 			if(spaceFree){
 				
 				if(hostProgram.getJFrameById("Add Ball")==null){
@@ -907,8 +917,15 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 
 				
 			}
-			else messages.addMessage("Sorry: Cannot add ball here, space is already occupied by another ball.", messages.CENTER);
-
+			else //addOrEditBoolean = true, but spaceFree = false.
+				messages.addMessage("Sorry: Cannot add ball here, space is already occupied by another ball.", messages.CENTER);
+			}
+			else{//addOrEditBoolean = false.
+				if(!spaceFree){
+					//DO EDITING
+				}
+			}
+			
 		}
 
 	}

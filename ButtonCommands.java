@@ -154,3 +154,31 @@ class addBallCommand extends ButtonCommands{
 		
 	}
 }
+
+class addOrEditCommand extends ButtonCommands{
+
+	initialDisplay newD = (initialDisplay) d;
+	addOrEditCommand(Display d) {
+		super(d);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	void execute(int caseNum) {
+switch(caseNum%2){
+		
+		
+		case 0:
+			
+			newD.addOrEditBoolean = false;
+			//Going to edit.
+			break;
+		case 1:
+			newD.addOrEditBoolean = true;
+			//Going to add.
+			break;
+		}
+		
+	}
+	
+}
