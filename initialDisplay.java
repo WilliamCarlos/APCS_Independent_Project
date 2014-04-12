@@ -39,6 +39,10 @@ import javax.swing.text.PlainDocument;
 public class initialDisplay extends Display implements MouseListener, MouseMotionListener {
 
 
+	public onScreenMessage messages;
+	
+	
+	
 	public final double k = 8.987551787368176*Math.pow(10, 9);
 	public final double permitivity_of_free_space = 8.85418782 * Math.pow(10, -12);
 
@@ -98,6 +102,8 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 	}
 
 	public void init() {
+		
+		messages = new onScreenMessage(hostProgram);
 
 		
 		this.voltageBarX = (int)(width/1.18);
@@ -214,6 +220,15 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 
 	public void paintComponent(Graphics g) {
 
+		while(!messages.isEmpty()){
+			messages.printMessage();
+			try {
+				Thread.sleep(3500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		g.setColor(Color.BLACK);
 		if(elasticWalls)g.setColor(Color.green);
 
@@ -892,7 +907,7 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 
 				
 			}
-			else System.out.println("Sorry: Cannot add ball here, space is already occupied by another ball.");
+			else messages.addMessage("Sorry: Cannot add ball here, space is already occupied by another ball.", messages.CENTER);
 
 		}
 
