@@ -13,7 +13,7 @@ public abstract class ButtonCommands{
 }
 
 class pauseBallMovement extends ButtonCommands{
-	initialDisplay newD = (initialDisplay) d;// Done to get access to stuff in initialDisplay and not just Display
+	private final initialDisplay newD = (initialDisplay) d;// Done to get access to stuff in initialDisplay and not just Display
 	
 
 	pauseBallMovement(initialDisplay d) {
@@ -65,7 +65,7 @@ class Reset extends ButtonCommands{
 
 
 class VoltageOnOff extends ButtonCommands{
-	initialDisplay newD = (initialDisplay) d;// Done to get access to stuff in initialDisplay and not just Display
+	private final initialDisplay newD = (initialDisplay) d;// Done to get access to stuff in initialDisplay and not just Display
 	
 	VoltageOnOff(initialDisplay d) {
 		super(d); //Useless in this place, cuz we are using an initialDisplay.
@@ -95,7 +95,7 @@ class VoltageOnOff extends ButtonCommands{
 
 class toogleElasticWalls extends ButtonCommands{
 
-	initialDisplay newD = (initialDisplay) d;// Done to get access to stuff in initialDisplay and not just Display
+	private final initialDisplay newD = (initialDisplay) d;// Done to get access to stuff in initialDisplay and not just Display
 	
 
 	toogleElasticWalls(initialDisplay d) {
@@ -157,7 +157,7 @@ class addBallCommand extends ButtonCommands{
 
 class addOrEditCommand extends ButtonCommands{
 
-	initialDisplay newD = (initialDisplay) d;
+	private final initialDisplay newD = (initialDisplay) d;
 	addOrEditCommand(Display d) {
 		super(d);
 		// TODO Auto-generated constructor stub
@@ -178,6 +178,31 @@ switch(caseNum%2){
 			//Going to add.
 			break;
 		}
+		
+	}
+	
+}
+
+class updateBallCommand extends ButtonCommands{
+	
+	private final JFrame callingFrame;
+	private final initialDisplay newD = (initialDisplay) d;
+	private final Ball b;
+	private final int ballIndex;
+
+	
+	
+	updateBallCommand(JFrame callingFrame,Display d, Ball b, int ballIndex) {
+		super(d);
+		this.b = b;
+		this.ballIndex = ballIndex;
+		this.callingFrame = callingFrame;
+	}
+	@Override
+	void execute(int caseNum) {
+		b.setColor(Ball.defualtColor);
+		newD.ballarray.set(ballIndex, b);
+		callingFrame.dispatchEvent(new WindowEvent(callingFrame, WindowEvent.WINDOW_CLOSING));
 		
 	}
 	

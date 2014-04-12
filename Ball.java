@@ -8,19 +8,21 @@ public class Ball {
 	public boolean hitWall;
 	public initialDisplay d;
 	private Color color = Color.GREEN;
+	public static final Color defualtColor = Color.green;
 	
 	public Force force = new Force();
 	Line2D.Double forceVector;
 
 
-	public Ball (initialDisplay d, double size, double X, double Y, double dx, double dy, double charge) {
+	public Ball (initialDisplay d, double mass, double X, double Y, double dx, double dy, double charge) {
 		this.d = d;
-		mySize = size;
+		mySize = Math.pow(400000*mass, 0.5)*2;
 		x = X;
 		y = Y;
 		dx = dx;
 		dy = dy;
-		mass = Math.pow(getRadius(), 2)/500000;
+		this.mass = mass;
+		
 		//double angle = 2 * Math.PI * Math.random();  // Random direction.
 		
 		hitWall = false;
@@ -131,6 +133,13 @@ public class Ball {
 	}
 	public void setColor(Color c){
 		this.color = c;
+	}
+	public void setMass(double m){
+		this.mass = m;
+		setSize(Math.pow(400000*m, 0.5)*2);//Same as the calculation in the constructor
+	}
+	private void setSize(double d){
+		this.mySize = d;
 	}
 
 }

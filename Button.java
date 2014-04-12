@@ -28,4 +28,8 @@ import javax.swing.JButton;
 			timesClicked++;	
 
 		}
+		
+		public void simulateClick(){
+			actionPerformed(new ActionEvent(this, 0, ""));
+		}
 	}

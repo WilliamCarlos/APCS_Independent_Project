@@ -175,7 +175,7 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 		for (int i = 0; i<3; i++) {
 			for (int j = 0; j<2; j++) {
 
-				ballarray.add(new Ball(this,15, width/2-135+i*30, height/6+65+j*30, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000)));
+				ballarray.add(new Ball(this,0.00015, width/2-135+i*30, height/6+65+j*30, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000)));
 				originalX.add(ballarray.get(ballarray.size()-1).x);
 				originalY.add(ballarray.get(ballarray.size()-1).y);
 
@@ -197,7 +197,7 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 		}
 
 
-		ballarray.add(new Ball(this,10, width/2-135+0*30, height/6+65+5*30, 0, 0, -Math.max(Math.random()*100/1000000, 35/1000000)));
+		ballarray.add(new Ball(this,0.000075, width/2-135+0*30, height/6+65+5*30, 0, 0, -Math.max(Math.random()*100/1000000, 35/1000000)));
 
 		originalX.add(ballarray.get(ballarray.size()-1).x);
 		originalY.add(ballarray.get(ballarray.size()-1).y);
@@ -698,6 +698,7 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 	private Force calculateElectricField(Ball ball, Point point) {
 		double magnitude = ball.charge*k;
 		magnitude/=distanceSquared(ball, new Ball(this,0, point.x, point.y, 0, 0, 0));
+		
 		// Only thing that matters for distanceSquared is the x and y coords, 
 		//thus all the rest can be 0s.
 		double theta = calculateTheta(ball, new Ball(this,0, point.x, point.y, 0, 0, 0));
@@ -722,7 +723,13 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 		boolean attract = attract(ballA, ballB);
 		magnitude *= k;
 		double distSquare = distanceSquared(ballA, ballB);
-
+		magnitude /= distSquare;
+		
+		if(Math.pow(distSquare, 0.5)<7){
+			magnitude = 0;//This is to get rid of the acceleration bug.
+			//It works in the sense that anyhow, the forces would cancel out when the balls cross.
+		}
+		
 		/*
 		if(distSquare<1&&distSquare!=0){
 			System.out.println("FFFFFFFFFFFFFFFFFFFF " + distSquare);
@@ -730,7 +737,7 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 		}
 		 */
 
-		magnitude /= distSquare;
+		
 
 		double theta = calculateTheta(ballA, ballB);
 		if(!attract){
@@ -878,7 +885,10 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 			if(spaceFree){
 				
 				if(hostProgram.getJFrameById("Add Ball")==null){
+					final boolean ballsWhereMoving;
 					
+					if(ballsMoving) {ballStart.simulateClick();ballsWhereMoving =true;}//Always pause.
+					else ballsWhereMoving = false;
 							hostProgram.createJFrame(50, 50, "Add Ball", new Color(255,153,0), false, "Add Ball");
 							
 							final int pendingBallsSize = pendingBalls.size(); //This is how many balls are already in the process of being added.
@@ -886,6 +896,9 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 							addBallF.addWindowListener(new java.awt.event.WindowAdapter() {
 							    @Override
 							    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+							    	if(ballsWhereMoving){
+							    		if(!ballsMoving)ballStart.simulateClick();
+							    	}
 							    	hostProgram.framesId.remove("Add Ball");
 							    	hostProgram.frames.remove(addBallF);
 							    	pendingBalls.set(pendingBallsSize, null);//Note: We don't use pendingBalls.size(), 
@@ -915,7 +928,7 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 							Display addBallD = new addBallDisplay(addBallF.getWidth(), addBallF.getHeight(), addBallF, hostProgram, a.getX(), a.getY(), this, pendingBallsSize);
 							addBallF.add(addBallD);
 
-							pendingBalls.add(new Ball(this, 40, a.getX(), a.getY(), 0, 0, 0));
+							pendingBalls.add(new Ball(this, 0.00040, a.getX(), a.getY(), 0, 0, 0));
 						
 					
 
@@ -930,20 +943,33 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 			}
 			else{//addOrEditBoolean = false.
 				if(!spaceFree){
-					//DO EDITING
+					
 					
 					
 					if(hostProgram.getJFrameById("Edit Ball")==null){
-						ballInSpace.setColor(Color.cyan);
+						
+						final boolean ballsWhereMoving;
+						
+						if(ballsMoving) {ballStart.simulateClick();ballsWhereMoving =true;}//Always pause.
+						else ballsWhereMoving = false;
+						
 						hostProgram.createJFrame(50, 50, "Edit Ball", new Color(255,153,0), false, "Edit Ball");
 						
 						
 						final JFrame editBallF = hostProgram.getJFrameById("Edit Ball");
-						
+						editBallF.addWindowListener(new java.awt.event.WindowAdapter() {
+						    @Override
+						    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+						    	if(ballsWhereMoving){
+						    		if(!ballsMoving)ballStart.simulateClick();
+						    	}
+						    	hostProgram.framesId.remove("Edit Ball");
+						    	hostProgram.frames.remove(editBallF);
+						    	}});
 
 						Display editBallD = new editBallDisplay(editBallF.getWidth(), editBallF.getHeight(), editBallF, hostProgram, this, ballarray.indexOf(ballInSpace));
 						editBallF.add(editBallD);
-
+						ballInSpace.setColor(Color.cyan);
 					
 				
 
