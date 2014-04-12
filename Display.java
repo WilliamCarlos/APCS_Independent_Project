@@ -49,6 +49,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	/*
 	int xOffset;
 	int yOffset;*/ //Not implemented for now.
+	Program hostProgram;
 	JFrame hostFrame;
 	double volume;
 	double lastvolume;
@@ -86,11 +87,12 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	boolean elasticWalls;
 
 
-	public Display(int w, int h, JFrame f) {
+	public Display(int w, int h, JFrame f, Program p) {
 		
-		width = w;
-		height = h;
-		hostFrame = f;
+		this.width = w;
+		this.height = h;
+		this.hostFrame = f;
+		this.hostProgram = p;
 	
 		this.setBounds(0, 0, w, h);
 		
@@ -801,6 +803,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 						)spaceFree=false;
 			}
 			if(spaceFree){
+		
 			Ball add = new Ball(this,15, a.getX(), a.getY(), 0, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000));
 			ballarray.add(add);
 			originalX.add(ballarray.get(ballarray.size()-1).x);

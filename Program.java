@@ -11,7 +11,7 @@ import java.awt.Toolkit;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
-public class Main { 
+public class Program { 
 	
 	
 	ArrayList<JFrame> frames = new ArrayList<JFrame>();
@@ -27,16 +27,16 @@ public class Main {
 	static final int yOffSet = xOffSet;
 	
 	
-	static Display display = new Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, initialF); 
+
 	
-	public static void main(String[] args) { initialF.setSize(DISPLAY_WIDTH, DISPLAY_HEIGHT); 
+	Program(){ initialF.setSize(DISPLAY_WIDTH, DISPLAY_HEIGHT); 
 	initialF.setLayout(null); 
 	initialF.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
 	initialF.setTitle("Particles in Electric Field Simulator"); 
 	initialF.getContentPane().setBackground(new Color(96,96,96));
 	
 	Display initialD = createDisplay(xOffSet, yOffSet, DISPLAY_WIDTH - (2*xOffSet), 
-			DISPLAY_HEIGHT - (2*yOffSet), initialF);
+			DISPLAY_HEIGHT - (2*yOffSet), initialF, this);
 
 	
 	initialF.add(initialD); 
@@ -44,9 +44,9 @@ public class Main {
 	initialF.setResizable(false);
 	} 
 
-	public static Display createDisplay(int x, int y, int w, int h, JFrame f) {
+	public Display createDisplay(int x, int y, int w, int h, JFrame f, Program p) {
 		//Not using x and y offsets for now.
-		return new Display(w, h, f);
+		return new Display(w, h, f, p);
 	} 
 	public void createJFrame(double percentageOfScreenWidth, double percentageOfScreenHeight,
 			String title, Color background, Boolean resizable, final String id){
