@@ -861,10 +861,18 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 
 			//Make sure we are not placing this on another ball.
 			boolean spaceFree = true;
+			Ball ballInSpace = null;
 			for(Ball b : ballarray){
 				if(a.getX()>=b.x-b.getRadius()&&a.getX()<=b.x+b.getRadius()
 						&&a.getY()>=b.y-b.getRadius()&&a.getY()<=b.y+b.getRadius()
 						)spaceFree=false;
+			}
+			if(!spaceFree){
+				for(Ball b : ballarray){
+					if(a.getX()>=b.x-b.getRadius()&&a.getX()<=b.x+b.getRadius()
+							&&a.getY()>=b.y-b.getRadius()&&a.getY()<=b.y+b.getRadius()
+							)ballInSpace = b;
+				}
 			}
 			if(addOrEditBoolean){
 			if(spaceFree){
@@ -923,6 +931,24 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 			else{//addOrEditBoolean = false.
 				if(!spaceFree){
 					//DO EDITING
+					
+					
+					if(hostProgram.getJFrameById("Edit Ball")==null){
+						ballInSpace.setColor(Color.cyan);
+						hostProgram.createJFrame(50, 50, "Edit Ball", new Color(255,153,0), false, "Edit Ball");
+						
+						
+						final JFrame editBallF = hostProgram.getJFrameById("Edit Ball");
+						
+
+						Display editBallD = new editBallDisplay(editBallF.getWidth(), editBallF.getHeight(), editBallF, hostProgram, this, ballarray.indexOf(ballInSpace));
+						editBallF.add(editBallD);
+
+					
+				
+
+
+			}else{hostProgram.getJFrameById("Edit Ball").toFront();}
 				}
 			}
 			
