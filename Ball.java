@@ -4,26 +4,25 @@ import java.awt.geom.Line2D;
 
 
 public class Ball {
-	public double x, y, mySize, mass, dx, dy, speed, charge, acceleration, accelerationD;
+	public double x, y, mySize, mass, dx, dy, charge, acceleration, accelerationD;
 	public boolean hitWall;
 	public initialDisplay d;
+	private Color color = Color.GREEN;
 	
 	public Force force = new Force();
 	Line2D.Double forceVector;
 
 
-	public Ball (initialDisplay d, double size, double X, double Y, double dirx, double diry, double sped, double charge) {
+	public Ball (initialDisplay d, double size, double X, double Y, double dx, double dy, double charge) {
 		this.d = d;
 		mySize = size;
 		x = X;
 		y = Y;
-		dx = dirx;
-		dy = diry;
+		dx = dx;
+		dy = dy;
 		mass = Math.pow(getRadius(), 2)/500000;
 		//double angle = 2 * Math.PI * Math.random();  // Random direction.
-		speed = sped+Math.random()/100;    // Random speed.
-		dx = 1 * speed;
-		dy = 1 * speed;
+		
 		hitWall = false;
 		this.charge = charge;
 	}
@@ -32,14 +31,18 @@ public class Ball {
 		return mySize/2;
 	}
 	
-	public double getSpeed(){
-		return Math.pow(Math.pow(dx, 2) + Math.pow(dy, 2), 0.5);
+
+	public double getXSpeed(){
+		return dx;
+	}
+	public double getYSpeed(){
+		return dy;
 	}
 
 	public void draw(Graphics g) {
 		double xx = x-getRadius();
 		double yy = y-getRadius();
-		g.setColor(Color.green);
+		g.setColor(color);
 		g.fillOval((int) xx, (int) yy, (int) mySize, (int) mySize);
 	}
 
@@ -105,6 +108,29 @@ public class Ball {
 		if(y <= height/6 + 3) {
 			y+=radius;
 		}
+	}
+
+	public double getSpeed() {
+		return Math.pow(Math.pow(dx, 2) + Math.pow(dy, 2), 0.5);
+	}
+
+	public double getY() {
+		return y;
+	}
+	public void setY(double y){
+		this.y = y;
+	}
+	public double getX(){
+		return x;
+	}
+	public void setX(double x){
+		this.x = x;
+	}
+	public Color getColor(){
+		return color;
+	}
+	public void setColor(Color c){
+		this.color = c;
 	}
 
 }

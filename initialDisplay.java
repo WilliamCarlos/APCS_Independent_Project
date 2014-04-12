@@ -18,35 +18,44 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.SwingWorker;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 
 
 public class initialDisplay extends Display implements MouseListener, MouseMotionListener {
-	
+
 
 	public final double k = 8.987551787368176*Math.pow(10, 9);
 	public final double permitivity_of_free_space = 8.85418782 * Math.pow(10, -12);
-	
+
 	private boolean paintloop = true;
 	public int TIME_BETWEEN_REPLOTS = 50;
 	private ballTextField balltextfield;
 
-	ArrayList<Ball> ballarray;
+	public ArrayList<Ball> ballarray;
+	public Queue<Ball> toAdd;//Includes the balls that are waiting to be added from "click on screen"
+	//ability to add. Must be public so that other classes can add to this (such as the popup).
+	public ArrayList<Ball> pendingBalls;//Used to display where you are adding a ball 
+	//Balls are in here only while they are being created using creation window.
+	
 	
 	int xdif = 0;
 	int ydif = 0;
-	
+
 
 	double volume;
 	double lastvolume;
@@ -87,16 +96,17 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 		super(w, h, f, program);
 		init();
 	}
-	
+
 	public void init() {
+
 		
 		this.voltageBarX = (int)(width/1.18);
 		this.voltageBarY = height/6 + height/100;
 		this.electricField = new Force[width][height];
 		this.voltageValue = new double[width][height];
-		
+
 		balltextfield = new ballTextField();
-		
+
 		setSize(width, height);
 		paintloop = true;
 
@@ -112,20 +122,22 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 		reset.setBounds(height/9 +225, width/20, 100, 50);
 		add(reset);
 		reset.setVisible(true);
-		
-		String[] elasticWallsArray = {"Elastic: Off", "Elastic: On"};
+
+		String[] elasticWallsArray = {"Elastic: On", "Elastic: Off"};
 		elasticWallsButton = new Button(new toogleElasticWalls(this), elasticWallsArray);
 		elasticWallsButton.setBounds(height/9 +325, width/20, 100, 50);
 		add(elasticWallsButton);
 		elasticWallsButton.setVisible(true);
 
-		String[] voltageOnOff = {"Voltage: On", "Voltage: Off"};
+		String[] voltageOnOff = {"Voltage: Off", "Voltage: On"};
 		Voltage = new Button (new VoltageOnOff(this), voltageOnOff);
 		Voltage.setBounds(height/9 +425, width/20, 100, 50);
 		add(Voltage);
 		Voltage.setVisible(true);
 
+		toAdd = new LinkedList<Ball>();
 		ballarray = new ArrayList<Ball>();
+		pendingBalls = new ArrayList<Ball>();
 		chargeDisplay = new ArrayList<JLabel>();
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -149,7 +161,7 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 		for (int i = 0; i<3; i++) {
 			for (int j = 0; j<2; j++) {
 
-				ballarray.add(new Ball(this,15, width/2-135+i*30, height/6+65+j*30, 0, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000)));
+				ballarray.add(new Ball(this,15, width/2-135+i*30, height/6+65+j*30, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000)));
 				originalX.add(ballarray.get(ballarray.size()-1).x);
 				originalY.add(ballarray.get(ballarray.size()-1).y);
 
@@ -170,8 +182,8 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 
 		}
 
-		
-		ballarray.add(new Ball(this,10, width/2-135+0*30, height/6+65+5*30, 0, 0, 0, -Math.max(Math.random()*100/1000000, 35/1000000)));
+
+		ballarray.add(new Ball(this,10, width/2-135+0*30, height/6+65+5*30, 0, 0, -Math.max(Math.random()*100/1000000, 35/1000000)));
 
 		originalX.add(ballarray.get(ballarray.size()-1).x);
 		originalY.add(ballarray.get(ballarray.size()-1).y);
@@ -201,7 +213,7 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 	}
 
 	public void paintComponent(Graphics g) {
-		
+
 		g.setColor(Color.BLACK);
 		if(elasticWalls)g.setColor(Color.green);
 
@@ -228,6 +240,9 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 				e.printStackTrace();
 			}
 
+			if(toAdd!=null&&!toAdd.isEmpty()){
+				addBallsFromQueue();
+			}
 			if(ballsMoving) {
 				ballMovement(g);
 			}
@@ -243,10 +258,18 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 					ballarray.get(i).draw(g);
 				}
 				for(int i = 0; i<chargeDisplay.size(); i++) {
-					
+
 					updateJLabel(chargeDisplay.get(i), i);
 				}
-				
+				for(int i = 0; i < pendingBalls.size(); i++){
+					if(pendingBalls.get(i)!=null){//There may be nulls in pendingBalls.
+						//For issues described when adding the balls through adding new ball window,
+						//when a pending ball is 'removed' from the list, it is not truly removed,
+						//rather it is set to null.
+					pendingBalls.get(i).setColor(new Color(255,153,0, 128)); //Fourth value is opacity, int between 0 and 255.
+					pendingBalls.get(i).draw(g);}
+				}
+
 
 			}
 			repaint();
@@ -255,6 +278,61 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 
 
 		repaint();
+	}
+
+	//PreCodition to calling method: Queue toAdd is NOT empty.
+	//PostCondition to calling method: toAdd is emtpy only in MOST cases. In a case where toAdd
+	//contains a ball which needs to be added in a location which is occupied by an existing
+	//ball on the screen, then the ball that needs to be added will not be added during this call.
+	private void addBallsFromQueue() {
+		int numBallsToDoInNextCall = 0;//Used to make the method stop when this number of elements 
+		//is in the queue.
+		Ball waiting = toAdd.peek();
+		boolean spaceFree = true;
+		for(Ball b : ballarray){
+			if(waiting.getX()>=b.x-b.getRadius()&&waiting.getX()<=b.x+b.getRadius()
+					&&waiting.getY()>=b.y-b.getRadius()&&waiting.getY()<=b.y+b.getRadius()
+					)spaceFree=false;
+		}
+		if(!spaceFree){
+			/*
+			 * This is activated if the ball in the top of toAdd cannot be added during this method call.
+			 * If so, then the ball is removed and added at the end of the queue. 
+			 * Note: Queue is FIFO
+			 * 
+			 * numBallsToDoInNextCall is incremented, so to avoid an infinite loop,
+			 * and tell the method to stop trying to add the balls which were added to the end of
+			 * toAdd (the balls which are going to be added only in the next method call)
+			 */
+			Ball b = toAdd.poll();
+			toAdd.add(b);
+			numBallsToDoInNextCall++;
+
+		}
+		while(toAdd.size()>numBallsToDoInNextCall){
+			Ball b = toAdd.poll();
+			ballarray.add(b);
+			originalX.add(ballarray.get(ballarray.size()-1).x);
+			originalY.add(ballarray.get(ballarray.size()-1).y);
+			
+			
+			
+			//Code also adds a label to display the charge on the particle.
+			JLabel temp = new JLabel();
+
+
+			String str = "";
+			str+=(int)(ballarray.get(ballarray.size()-1).charge*1000000);
+			str+="µ";
+			temp.setText(str);
+			temp.setBounds((int)ballarray.get(ballarray.size()-1).x, (int)ballarray.get(ballarray.size()-1).y, 50, 25);
+			chargeDisplay.add(temp);
+			add(chargeDisplay.get(chargeDisplay.size()-1));
+			temp.setVisible(true);
+			repaint();
+			
+		}
+		
 	}
 
 	public void togglePaintLoop() {
@@ -295,11 +373,12 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 
 
 		}
+		/*
 		if (xdif!= 0 || ydif!=0) {
 			for (int i = 0; i<ballarray.size(); i++) {
-				ballarray.get(i).speed*=Math.sqrt(lastvolume/volume);
+				ballarray.get(i).getSpeed()*=Math.sqrt(lastvolume/volume);
 			}
-		}
+		}*/
 
 
 
@@ -594,10 +673,10 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 
 	private Force calculateElectricField(Ball ball, Point point) {
 		double magnitude = ball.charge*k;
-		magnitude/=distanceSquared(ball, new Ball(this,0, point.x, point.y, 0, 0, 0, 0));
+		magnitude/=distanceSquared(ball, new Ball(this,0, point.x, point.y, 0, 0, 0));
 		// Only thing that matters for distanceSquared is the x and y coords, 
 		//thus all the rest can be 0s.
-		double theta = calculateTheta(ball, new Ball(this,0, point.x, point.y, 0, 0, 0, 0));
+		double theta = calculateTheta(ball, new Ball(this,0, point.x, point.y, 0, 0, 0));
 		return new Force(magnitude, theta);
 	}
 
@@ -678,32 +757,6 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 		paintloop = value;
 	}
 
-	private class Button extends JButton implements ActionListener {
-
-		public int timesClicked = 0;
-		public int roundLength; //How many times button must be clicked to return to original
-		//position.
-		ButtonCommands command;
-		String[] strs; //Contains the strings that will be displayed on the button
-		//with every click.
-
-		Button(ButtonCommands command, String[]strs) {
-			super(strs[0]);
-			addActionListener(this);
-			this.command = command;
-			roundLength = strs.length;
-			this.strs = strs;
-
-
-		}
-
-		public void actionPerformed(ActionEvent arg0) {
-			this.setText(strs[(timesClicked+1)%roundLength]);
-			command.execute(timesClicked);
-			timesClicked++;	
-
-		}
-	}
 
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
@@ -790,35 +843,57 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 						)spaceFree=false;
 			}
 			if(spaceFree){
-		
+				
 				if(hostProgram.getJFrameById("Add Ball")==null){
 					
+							hostProgram.createJFrame(50, 50, "Add Ball", new Color(255,153,0), false, "Add Ball");
+							
+							final int pendingBallsSize = pendingBalls.size(); //This is how many balls are already in the process of being added.
+							final JFrame addBallF = hostProgram.getJFrameById("Add Ball");
+							addBallF.addWindowListener(new java.awt.event.WindowAdapter() {
+							    @Override
+							    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+							    	hostProgram.framesId.remove("Add Ball");
+							    	hostProgram.frames.remove(addBallF);
+							    	pendingBalls.set(pendingBallsSize, null);//Note: We don't use pendingBalls.size(), 
+							    	//as that size may change, and we want it to remove the current ball -- 
+							    	//We want it to remove the current pending ball, once the adding new ball 
+							    	//JFrame is closed.
+							    	//
+							    	//Note2: Also, there is no -1 after pendingBallsSize, 
+							    	//as the ball we want to remove will only be added later,
+							    	//meaning that the current size doesn't include it yet.
+							    	//
+							    	//Note 3: Also, we do not remove from pendingBalls, rather we
+							    	//set to null, as removing would affect the size of the array
+							    	//and in turn affect the indexes of the other balls in the 
+							    	//array. Affecting the other indexes of the array is bad,
+							    	//as it breaks the condition set in Note 1, 
+							    	//that pendingBallsSize should be final and never change.
+							    	//Theoretically, it's a waste of storage to set to null,
+							    	//yet as we are talking about manually added balls ONLY in here
+							    	//the only storage space that is lost, is the storage required
+							    	//for storing NULL in an arraylist * the number of balls
+							    	//added manually by user (very small number compared to 
+							    	//data storage which is typically available.
+							    }
+							});
+
+							Display addBallD = new addBallDisplay(addBallF.getWidth(), addBallF.getHeight(), addBallF, hostProgram, a.getX(), a.getY(), this, pendingBallsSize);
+							addBallF.add(addBallD);
+
+							pendingBalls.add(new Ball(this, 40, a.getX(), a.getY(), 0, 0, 0));
+						
 					
-					hostProgram.createJFrame(50, 50, "Add Ball", new Color(255,153,0), false, "Add Ball");
-					JFrame addBallF = hostProgram.getJFrameById("Add Ball");
-					Display signInD = new addBallDisplay(addBallF.getWidth(), addBallF.getHeight(), addBallF, hostProgram);
-					addBallF.add(signInD);
-					}else{hostProgram.getJFrameById("signIn").toFront();}
-			Ball add = new Ball(this,15, a.getX(), a.getY(), 0, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000));
-			ballarray.add(add);
-			originalX.add(ballarray.get(ballarray.size()-1).x);
-			originalY.add(ballarray.get(ballarray.size()-1).y);
-/*
-			JLabel temp = new JLabel();
 
 
-			String str = "";
-			str+=(int)(ballarray.get(ballarray.size()-1).charge*1000000);
-			str+="µ";
-			temp.setText(str);
-			temp.setBounds((int)ballarray.get(ballarray.size()-1).x, (int)ballarray.get(ballarray.size()-1).y, 50, 25);
-			chargeDisplay.add(temp);
-			add(chargeDisplay.get(chargeDisplay.size()-1));
-			temp.setVisible(true);
-			repaint();*/
-		}
+				}else{hostProgram.getJFrameById("Add Ball").toFront();}
+
+
+				
+			}
 			else System.out.println("Sorry: Cannot add ball here, space is already occupied by another ball.");
-			
+
 		}
 
 	}
@@ -852,28 +927,28 @@ public class initialDisplay extends Display implements MouseListener, MouseMotio
 	}
 
 	private class ballTextField extends JFormattedTextField implements PropertyChangeListener {
-		 private JLabel Size;
-		 private JLabel Force;
-		 
-		 private String size = "Size: ";
-		 private String force = "Force: ";
-		 
+		private JLabel Size;
+		private JLabel Force;
+
+		private String size = "Size: ";
+		private String force = "Force: ";
+
 		ballTextField() {
 			setColumns(10);
 		}
-		
+
 		protected Document createDefaultModel() {
-	         return new ballDocument();
-	    }
-		
+			return new ballDocument();
+		}
+
 		class ballDocument extends PlainDocument {
-			
+
 		}
 
 		@Override
 		public void propertyChange(PropertyChangeEvent arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
 }

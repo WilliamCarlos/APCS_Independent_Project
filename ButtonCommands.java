@@ -1,6 +1,11 @@
+import java.awt.event.WindowEvent;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
 public abstract class ButtonCommands{
-	initialDisplay d;
-	ButtonCommands(initialDisplay d){
+	Display d;
+	ButtonCommands(Display d){
 		this.d = d;
 	}
 	
@@ -8,25 +13,30 @@ public abstract class ButtonCommands{
 }
 
 class pauseBallMovement extends ButtonCommands{
-
+	initialDisplay newD = (initialDisplay) d;// Done to get access to stuff in initialDisplay and not just Display
 	
 
 	pauseBallMovement(initialDisplay d) {
-		super(d);
-		// TODO Auto-generated constructor stub
+		super(d); //Useless in this place, cuz we are using an initialDisplay.
+		//Only kept here if we need to use in future.
+		
 	}
 
+	
 	@Override
 	void execute(int caseNum) {
+		
 
 		switch(caseNum%2){
 		
+		
 		case 0:
-			d.ballsMoving = true;
+			
+			newD.ballsMoving = true;
 			
 			break;
 		case 1:
-			d.ballsMoving = false;
+			newD.ballsMoving = false;
 			
 			break;
 		}
@@ -39,8 +49,8 @@ class Reset extends ButtonCommands{
 	
 
 	Reset(initialDisplay d) {
-		super(d);
-		// TODO Auto-generated constructor stub
+		super(d); //Useless in this place, cuz we are using an initialDisplay.
+		//Only kept here if we need to use in future.
 	}
 
 	@Override
@@ -55,11 +65,11 @@ class Reset extends ButtonCommands{
 
 
 class VoltageOnOff extends ButtonCommands{
-
+	initialDisplay newD = (initialDisplay) d;// Done to get access to stuff in initialDisplay and not just Display
 	
 	VoltageOnOff(initialDisplay d) {
-		super(d);
-		// TODO Auto-generated constructor stub
+		super(d); //Useless in this place, cuz we are using an initialDisplay.
+		//Only kept here if we need to use in future.
 	}
 
 	void execute(int caseNum) {
@@ -67,16 +77,16 @@ class VoltageOnOff extends ButtonCommands{
 		switch(caseNum%2){
 		
 		case 0:
-			d.drawVoltage = true;
-			d.voltageCalcing = true;
-			d.voltageBarMax.setVisible(true);
-			d.voltageBarMin.setVisible(true);
+			newD.drawVoltage = true;
+			newD.voltageCalcing = true;
+			newD.voltageBarMax.setVisible(true);
+			newD.voltageBarMin.setVisible(true);
 			break;
 		case 1:
-			d.drawVoltage = false;
-			d.voltageCalcing = false;
-			d.voltageBarMax.setVisible(false);
-			d.voltageBarMin.setVisible(false);
+			newD.drawVoltage = false;
+			newD.voltageCalcing = false;
+			newD.voltageBarMax.setVisible(false);
+			newD.voltageBarMin.setVisible(false);
 			break;
 		}
 	}
@@ -85,23 +95,62 @@ class VoltageOnOff extends ButtonCommands{
 
 class toogleElasticWalls extends ButtonCommands{
 
+	initialDisplay newD = (initialDisplay) d;// Done to get access to stuff in initialDisplay and not just Display
+	
 
 	toogleElasticWalls(initialDisplay d) {
-		super(d);
-		// TODO Auto-generated constructor stub
+		super(d); //Useless in this place, cuz we are using an initialDisplay.
+		//Only kept here if we need to use in future.
 	}
 
 	@Override
 	void execute(int caseNum) {
 		switch(caseNum%2){
 		case 0:
-			d.elasticWalls = false;
+			newD.elasticWalls = false;
 			break;
 		case 1:
-			d.elasticWalls = true;
+			newD.elasticWalls = true;
 			break;
 		}
 		
 	}
 	
+}
+
+class addBallCommand extends ButtonCommands{
+
+	private final JFrame callingFrame;
+	private final initialDisplay d;
+	private final double size;
+	private final double X;
+	private final double Y;
+	private final double xspeed;
+	private final double yspeed;
+	private final double charge;
+	private final int pendingBallArraySizeBeforeAddingOurBall;
+	
+	addBallCommand(JFrame callingFrame, initialDisplay d, double size, double X, double Y, double xspeed, double yspeed, double charge, int pendingBallArraySize) {
+		super(d); //Useless in this place, cuz we are using an initialDisplay.
+		//Only kept here if we need to use in future.
+		this.callingFrame = callingFrame;
+		this.d = d;
+		this.size = size;
+		this.X = X;
+		this.Y = Y;
+		this.xspeed = xspeed;
+		this.yspeed = yspeed;
+		this.charge = charge;
+		this.pendingBallArraySizeBeforeAddingOurBall = pendingBallArraySize;
+		
+	}
+
+	@Override
+	void execute(int caseNum) {
+		d.toAdd.add(new Ball(d, size, X, Y, xspeed, yspeed, charge));
+		
+		
+		callingFrame.dispatchEvent(new WindowEvent(callingFrame, WindowEvent.WINDOW_CLOSING));
+		
+	}
 }
