@@ -46,7 +46,7 @@ public class Program {
 
 	public Display createDisplay(int x, int y, int w, int h, JFrame f, Program p) {
 		//Not using x and y offsets for now.
-		return new Display(w, h, f, p);
+		return new initialDisplay(w, h, f, p);
 	} 
 	public void createJFrame(double percentageOfScreenWidth, double percentageOfScreenHeight,
 			String title, Color background, Boolean resizable, final String id){

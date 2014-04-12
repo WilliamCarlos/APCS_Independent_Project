@@ -6,13 +6,13 @@ import java.awt.geom.Line2D;
 public class Ball {
 	public double x, y, mySize, mass, dx, dy, speed, charge, acceleration, accelerationD;
 	public boolean hitWall;
-	public Display d;
+	public initialDisplay d;
 	
 	public Force force = new Force();
 	Line2D.Double forceVector;
 
 
-	public Ball (Display d, double size, double X, double Y, double dirx, double diry, double sped, double charge) {
+	public Ball (initialDisplay d, double size, double X, double Y, double dirx, double diry, double sped, double charge) {
 		this.d = d;
 		mySize = size;
 		x = X;

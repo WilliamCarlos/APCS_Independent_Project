@@ -1,6 +1,6 @@
 public abstract class ButtonCommands{
-	Display d;
-	ButtonCommands(Display d){
+	initialDisplay d;
+	ButtonCommands(initialDisplay d){
 		this.d = d;
 	}
 	
@@ -9,9 +9,11 @@ public abstract class ButtonCommands{
 
 class pauseBallMovement extends ButtonCommands{
 
-	pauseBallMovement(Display d) {
+	
+
+	pauseBallMovement(initialDisplay d) {
 		super(d);
-		
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -34,7 +36,9 @@ class pauseBallMovement extends ButtonCommands{
 
 class Reset extends ButtonCommands{
 
-	Reset(Display d) {
+	
+
+	Reset(initialDisplay d) {
 		super(d);
 		// TODO Auto-generated constructor stub
 	}
@@ -52,11 +56,12 @@ class Reset extends ButtonCommands{
 
 class VoltageOnOff extends ButtonCommands{
 
-	VoltageOnOff(Display d) {
+	
+	VoltageOnOff(initialDisplay d) {
 		super(d);
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	void execute(int caseNum) {
 
 		switch(caseNum%2){
@@ -81,9 +86,8 @@ class VoltageOnOff extends ButtonCommands{
 class toogleElasticWalls extends ButtonCommands{
 
 
-	toogleElasticWalls(Display d) {
+	toogleElasticWalls(initialDisplay d) {
 		super(d);
-		
 		// TODO Auto-generated constructor stub
 	}
 

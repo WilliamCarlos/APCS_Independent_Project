@@ -32,11 +32,12 @@ import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 
 
-public class Display extends JComponent implements MouseListener, MouseMotionListener {
+public class initialDisplay extends Display implements MouseListener, MouseMotionListener {
+	
+
 	public final double k = 8.987551787368176*Math.pow(10, 9);
 	public final double permitivity_of_free_space = 8.85418782 * Math.pow(10, -12);
-	public int width;   
-	public int height;
+	
 	private boolean paintloop = true;
 	public int TIME_BETWEEN_REPLOTS = 50;
 	private ballTextField balltextfield;
@@ -46,11 +47,7 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	int xdif = 0;
 	int ydif = 0;
 	
-	/*
-	int xOffset;
-	int yOffset;*/ //Not implemented for now.
-	Program hostProgram;
-	JFrame hostFrame;
+
 	double volume;
 	double lastvolume;
 	ArrayList<Double> originalX = new ArrayList<Double>();
@@ -86,27 +83,17 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 	boolean drawBalls;
 	boolean elasticWalls;
 
-
-	public Display(int w, int h, JFrame f, Program p) {
-		
-		this.width = w;
-		this.height = h;
-		this.hostFrame = f;
-		this.hostProgram = p;
+	public initialDisplay(int w, int h, JFrame f, Program program) {
+		super(w, h, f, program);
+		init();
+	}
 	
-		this.setBounds(0, 0, w, h);
-		
+	public void init() {
 		
 		this.voltageBarX = (int)(width/1.18);
 		this.voltageBarY = height/6 + height/100;
 		this.electricField = new Force[width][height];
 		this.voltageValue = new double[width][height];
-
-		
-		init();
-	}
-
-	public void init() {
 		
 		balltextfield = new ballTextField();
 		
@@ -804,6 +791,14 @@ public class Display extends JComponent implements MouseListener, MouseMotionLis
 			}
 			if(spaceFree){
 		
+				if(hostProgram.getJFrameById("Add Ball")==null){
+					
+					
+					hostProgram.createJFrame(50, 50, "Add Ball", new Color(255,153,0), false, "Add Ball");
+					JFrame addBallF = hostProgram.getJFrameById("Add Ball");
+					Display signInD = new addBallDisplay(addBallF.getWidth(), addBallF.getHeight(), addBallF, hostProgram);
+					addBallF.add(signInD);
+					}else{hostProgram.getJFrameById("signIn").toFront();}
 			Ball add = new Ball(this,15, a.getX(), a.getY(), 0, 0, 0, Math.max((Math.random()*100/1000000), 200/1000000));
 			ballarray.add(add);
 			originalX.add(ballarray.get(ballarray.size()-1).x);
